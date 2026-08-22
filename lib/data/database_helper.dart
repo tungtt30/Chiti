@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const int _dbVersion = 2;
+  static const int _dbVersion = 3;
   static Database? _database;
 
   Future<Database> get database async {
@@ -31,19 +31,24 @@ class DatabaseHelper {
     await _createSchema(db);
   }
 
-  /// v1 -> v2 rebuilds the schema. This app targets a fresh offline-first
-  /// install; for dev releases we recreate the tables on upgrade.
+  /// v2 -> v3 rebuilds the schema for the minimal subset-split model. This app
+  /// targets a fresh offline-first install; for dev releases we recreate the
+  /// tables on upgrade (stored data is cleared).
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
+    if (oldVersion < 3) {
       await _dropSchema(db);
       await _createSchema(db);
     }
   }
 
   Future<void> _dropSchema(Database db) async {
+    // Drop referencing tables before their parents, otherwise the legacy v2
+    // child tables (expense_payers/expense_splits) break FK resolution when a
+    // parent (expenses/participants) is dropped with PRAGMA foreign_keys = ON.
     await db.execute('DROP TABLE IF EXISTS settlements');
     await db.execute('DROP TABLE IF EXISTS expense_payers');
     await db.execute('DROP TABLE IF EXISTS expense_splits');
+    await db.execute('DROP TABLE IF EXISTS expense_participants');
     await db.execute('DROP TABLE IF EXISTS expenses');
     await db.execute('DROP TABLE IF EXISTS participants');
     await db.execute('DROP TABLE IF EXISTS trips');
@@ -81,33 +86,21 @@ class DatabaseHelper {
         trip_id TEXT NOT NULL,
         title TEXT NOT NULL,
         amount REAL NOT NULL,
-        date INTEGER NOT NULL,
-        category TEXT NOT NULL,
-        split_mode TEXT NOT NULL DEFAULT 'equal',
+        payer_id TEXT NOT NULL,
         created_at INTEGER NOT NULL,
-        FOREIGN KEY (trip_id) REFERENCES trips(id) ON DELETE CASCADE
+        FOREIGN KEY (trip_id) REFERENCES trips(id) ON DELETE CASCADE,
+        FOREIGN KEY (payer_id) REFERENCES participants(id) ON DELETE CASCADE
       )
     ''');
 
+    // Junction table: one row per participant who joins this expense, with the
+    // exact share they owe. Non-selected members have no row -> zero debt.
     await db.execute('''
-      CREATE TABLE expense_payers (
+      CREATE TABLE expense_participants (
         id TEXT PRIMARY KEY,
         expense_id TEXT NOT NULL,
         participant_id TEXT NOT NULL,
-        amount REAL NOT NULL,
-        FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE,
-        FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE expense_splits (
-        id TEXT PRIMARY KEY,
-        expense_id TEXT NOT NULL,
-        participant_id TEXT NOT NULL,
-        amount REAL NOT NULL,
-        weight REAL,
-        note TEXT,
+        share_amount REAL NOT NULL,
         FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE,
         FOREIGN KEY (participant_id) REFERENCES participants(id) ON DELETE CASCADE
       )
@@ -133,10 +126,11 @@ class DatabaseHelper {
     );
     await db.execute('CREATE INDEX idx_expenses_trip ON expenses(trip_id)');
     await db.execute(
-      'CREATE INDEX idx_expense_payers_expense ON expense_payers(expense_id)',
+      'CREATE INDEX idx_expenses_payer ON expenses(payer_id)',
     );
     await db.execute(
-      'CREATE INDEX idx_expense_splits_expense ON expense_splits(expense_id)',
+      'CREATE INDEX idx_expense_participants_expense '
+      'ON expense_participants(expense_id)',
     );
     await db.execute(
       'CREATE INDEX idx_settlements_trip ON settlements(trip_id)',

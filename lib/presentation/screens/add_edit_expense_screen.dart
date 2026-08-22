@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants.dart';
 import '../../core/formatters.dart';
 import '../../core/id_generator.dart';
 import '../../core/settlement_calculator.dart';
@@ -11,8 +10,8 @@ import '../widgets/participant_chips.dart';
 
 /// Create-or-edit expense form for a trip.
 ///
-/// Pass [existing] to open in edit mode (fields are pre-filled from the saved
-/// expense, its payers and per-person splits); leave it null for create mode.
+/// Each expense is split equally among a selected subset of members; one
+/// person pays the full amount. Pass [existing] to open in edit mode.
 class AddEditExpenseScreen extends ConsumerStatefulWidget {
   final String tripId;
   final Expense? existing;
@@ -27,18 +26,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
-  final Map<String, TextEditingController> _payerCtrls = {};
-  final Map<String, TextEditingController> _amountCtrls = {};
-  final Map<String, TextEditingController> _weightCtrls = {};
-  final Map<String, TextEditingController> _noteCtrls = {};
 
-  DateTime _date = DateTime.now();
-  String _category = ExpenseCategory.food;
-  String _splitMode = SplitMode.equal;
-  bool _shared = true;
-  bool _multiPayer = false;
   final Set<String> _selectedIds = {};
-  final Set<String> _payerIds = {};
+  String _payerId = '';
 
   /// True while prefilled data is being loaded in edit mode; gates the lazy
   /// self-seed branch in build() so it cannot overwrite the loaded values.
@@ -58,66 +48,23 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
     if (e != null) {
       _titleCtrl.text = e.title;
       _amountCtrl.text = _displayAmount(e.amount);
-      _date = e.date;
-      _category = e.category;
-      _splitMode = e.splitMode;
+      _payerId = e.payerId;
       _loadExisting();
     }
   }
 
-  /// In edit mode, fetch the saved payer/split rows and pre-fill the form.
+  /// In edit mode, fetch the saved participating-member rows and pre-fill the
+  /// selection.
   Future<void> _loadExisting() async {
     final e = _existing!;
     setState(() => _loadingExisting = true);
     final repo = ref.read(repositoryProvider);
     try {
-      final payers = await repo.getExpensePayers(e.id);
-      final splits = await repo.getExpenseSplits(e.id);
+      final participants = await repo.getExpenseParticipants(e.id);
       if (!mounted) return;
-
-      _multiPayer = payers.length > 1;
-      if (_multiPayer) {
-        _payerIds.addAll(payers.map((p) => p.participantId));
-        for (final p in payers) {
-          _payerCtrls.putIfAbsent(
-            p.participantId,
-            () => TextEditingController(),
-          ).text = _displayAmount(p.amount);
-        }
-      } else if (payers.isNotEmpty) {
-        _payerIds.add(payers.first.participantId);
-      }
-
-      _selectedIds.addAll(splits.map((s) => s.participantId));
-
-      final participants =
-          ref.read(participantsProvider(widget.tripId)).valueOrNull ?? [];
-      _shared = splits.length == participants.length && participants.isNotEmpty;
-
-      if (_splitMode == SplitMode.customAmount) {
-        for (final s in splits) {
-          _amountCtrls.putIfAbsent(
-            s.participantId,
-            () => TextEditingController(),
-          ).text = _displayAmount(s.amount);
-        }
-      } else if (_splitMode == SplitMode.customWeight) {
-        for (final s in splits) {
-          _weightCtrls.putIfAbsent(
-            s.participantId,
-            () => TextEditingController(),
-          ).text = _displayAmount(s.weight ?? 1);
-        }
-      }
-      for (final s in splits) {
-        final note = s.note;
-        if (note != null && note.isNotEmpty) {
-          _noteCtrls.putIfAbsent(
-            s.participantId,
-            () => TextEditingController(),
-          ).text = note;
-        }
-      }
+      _selectedIds
+        ..clear()
+        ..addAll(participants.map((p) => p.participantId));
       _selectionInitialized = true;
     } finally {
       if (mounted) setState(() => _loadingExisting = false);
@@ -128,18 +75,6 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
   void dispose() {
     _titleCtrl.dispose();
     _amountCtrl.dispose();
-    for (final c in _payerCtrls.values) {
-      c.dispose();
-    }
-    for (final c in _amountCtrls.values) {
-      c.dispose();
-    }
-    for (final c in _weightCtrls.values) {
-      c.dispose();
-    }
-    for (final c in _noteCtrls.values) {
-      c.dispose();
-    }
     super.dispose();
   }
 
@@ -151,184 +86,15 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
     return trip?.currency ?? 'VND';
   }
 
-  void _setShared(bool value) {
-    setState(() {
-      _shared = value;
-      if (value) {
-        _selectedIds
-          ..clear()
-          ..addAll(_participants(ref).map((p) => p.id));
-        _splitMode = SplitMode.equal;
-      }
-    });
-  }
-
   void _onAmountChanged() => setState(() {});
 
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (picked != null) setState(() => _date = picked);
-  }
-
   double? _total() => double.tryParse(_amountCtrl.text);
-
-  void _applyEqualSplit() {
-    if (_selectedIds.isEmpty) return;
-    final total = _total() ?? 0;
-    if (total <= 0) return;
-    setState(() {
-      _splitMode = SplitMode.equal;
-      final ids = _selectedIds.toList();
-      final perHead = splitEqually(total: total, count: ids.length);
-      for (var i = 0; i < ids.length; i++) {
-        _amountCtrls.putIfAbsent(ids[i], () => TextEditingController()).text =
-            _displayAmount(perHead[i]);
-      }
-    });
-  }
-
-  void _enterCustomAmounts() {
-    if (_selectedIds.isEmpty) return;
-    final total = _total() ?? 0;
-    final perHead = total > 0
-        ? splitEqually(total: total, count: _selectedIds.length)
-        : List.filled(_selectedIds.length, 0.0);
-    setState(() {
-      _splitMode = SplitMode.customAmount;
-      final ids = _selectedIds.toList();
-      for (var i = 0; i < ids.length; i++) {
-        final ctrl = _amountCtrls.putIfAbsent(
-          ids[i],
-          () => TextEditingController(),
-        );
-        ctrl.text = _displayAmount(perHead[i]);
-      }
-    });
-  }
-
-  void _enterWeights() {
-    if (_selectedIds.isEmpty) return;
-    setState(() {
-      _splitMode = SplitMode.customWeight;
-      for (final id in _selectedIds) {
-        _weightCtrls.putIfAbsent(id, () => TextEditingController(text: '1'));
-      }
-    });
-  }
 
   String _displayAmount(double value) {
     if (value == 0) return '0';
     final s = value.toStringAsFixed(2);
     if (s.endsWith('.00')) return s.substring(0, s.length - 3);
     return s;
-  }
-
-  /// Builds payer rows (single or multi) enforcing the sum equals the total.
-  List<ExpensePayer>? _buildPayers(double total) {
-    final payers = <ExpensePayer>[];
-    double payerTotal = 0;
-    if (!_multiPayer) {
-      final pid = _payerIds.first;
-      payers.add(
-        ExpensePayer(
-          id: generateId(),
-          expenseId: '',
-          participantId: pid,
-          amount: total,
-        ),
-      );
-      payerTotal = total;
-    } else {
-      for (final pid in _payerIds) {
-        final amt = double.tryParse(_payerCtrls[pid]?.text ?? '') ?? 0;
-        payerTotal += amt;
-        if (amt > 0) {
-          payers.add(
-            ExpensePayer(
-              id: generateId(),
-              expenseId: '',
-              participantId: pid,
-              amount: amt,
-            ),
-          );
-        }
-      }
-    }
-    if (payers.isEmpty || (payerTotal - total).abs() > 0.01) {
-      _showSnack(
-        'Payer amounts (${_displayAmount(payerTotal)}) must sum to the total '
-        '(${_displayAmount(total)})',
-      );
-      return null;
-    }
-    return payers;
-  }
-
-  /// Builds split rows by mode; returns null if custom amounts fail to sum.
-  List<ExpenseSplit>? _buildSplits(double total) {
-    final splits = <ExpenseSplit>[];
-    final ids = _selectedIds.toList();
-    switch (_splitMode) {
-      case SplitMode.customAmount:
-        double splitSum = 0;
-        for (final pid in ids) {
-          final amt = double.tryParse(_amountCtrls[pid]?.text ?? '') ?? 0;
-          splitSum += amt;
-          splits.add(
-            ExpenseSplit(
-              id: generateId(),
-              expenseId: '',
-              participantId: pid,
-              amount: amt,
-              note: _noteOf(pid),
-            ),
-          );
-        }
-        if ((splitSum - total).abs() > 0.01) {
-          _showSnack('Custom amounts must sum to the total');
-          return null;
-        }
-      case SplitMode.customWeight:
-        final weights = ids
-            .map((pid) => double.tryParse(_weightCtrls[pid]?.text ?? '0') ?? 0)
-            .toList();
-        if (weights.any((w) => w < 0)) {
-          _showSnack('Weights cannot be negative');
-          return null;
-        }
-        final shares = splitByWeight(total: total, weights: weights);
-        for (var i = 0; i < ids.length; i++) {
-          splits.add(
-            ExpenseSplit(
-              id: generateId(),
-              expenseId: '',
-              participantId: ids[i],
-              amount: shares[i],
-              weight: weights[i], // keep raw weight for re-editing
-              note: _noteOf(ids[i]),
-            ),
-          );
-        }
-      default: // SplitMode.equal
-        final shares = splitEqually(total: total, count: ids.length);
-        for (var i = 0; i < ids.length; i++) {
-          splits.add(
-            ExpenseSplit(
-              id: generateId(),
-              expenseId: '',
-              participantId: ids[i],
-              amount: shares[i],
-              note: _noteOf(ids[i]),
-            ),
-          );
-        }
-    }
-    return splits;
   }
 
   Future<void> _save() async {
@@ -339,19 +105,33 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
       _showSnack('Amount must be greater than 0');
       return;
     }
+    final users = _participants(ref);
     if (_selectedIds.isEmpty) {
       _showSnack('Select at least one participant to split');
       return;
     }
-    if (_payerIds.isEmpty) {
+    if (_payerId.isEmpty ||
+        !users.any((p) => p.id == _payerId)) {
       _showSnack('Select who paid');
       return;
     }
 
-    final payers = _buildPayers(total);
-    if (payers == null) return;
-    final splits = _buildSplits(total);
-    if (splits == null) return;
+    // Equal split among the selected subset, remainder on the last share.
+    final shares = computeSubsetShares(
+      total: total,
+      selectedIds: _selectedIds.toList(),
+      splitMode: 'equal',
+    );
+    final joined = _selectedIds
+        .map(
+          (id) => ExpenseParticipant(
+            id: generateId(),
+            expenseId: '',
+            participantId: id,
+            shareAmount: shares[id] ?? 0,
+          ),
+        )
+        .toList();
 
     if (_existing == null) {
       await ref
@@ -359,23 +139,18 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
           .createExpense(
             title: _titleCtrl.text.trim(),
             amount: total,
-            date: _date,
-            category: _category,
-            splitMode: _splitMode,
-            payers: payers,
-            splits: splits,
+            payerId: _payerId,
+            participants: joined,
           );
     } else {
       final updated = _existing!.copyWith(
         title: _titleCtrl.text.trim(),
         amount: total,
-        date: _date,
-        category: _category,
-        splitMode: _splitMode,
+        payerId: _payerId,
       );
       await ref
           .read(expensesProvider(widget.tripId).notifier)
-          .updateExpense(expense: updated, payers: payers, splits: splits);
+          .updateExpense(expense: updated, participants: joined);
     }
 
     if (mounted) Navigator.pop(context);
@@ -409,11 +184,6 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
     await ref
         .read(expensesProvider(widget.tripId).notifier)
         .deleteExpense(id);
-  }
-
-  String? _noteOf(String pid) {
-    final n = _noteCtrls[pid]?.text.trim();
-    return (n == null || n.isEmpty) ? null : n;
   }
 
   void _showSnack(String message) {
@@ -452,14 +222,12 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
           if (!_selectionInitialized) {
             _selectionInitialized = true;
-            if (_selectedIds.isEmpty) {
-              _selectedIds
-                ..clear()
-                ..addAll(participants.map((p) => p.id));
-            }
-            if (_payerIds.isEmpty) {
-              _payerIds.add(participants.first.id);
-            }
+            _selectedIds
+              ..clear()
+              ..addAll(participants.map((p) => p.id));
+          }
+          if (_payerId.isEmpty) {
+            _payerId = participants.first.id;
           }
 
           // Instant on-the-spot calculation driving the live preview below.
@@ -467,27 +235,8 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
           final shares = computeSubsetShares(
             total: previewTotal,
             selectedIds: _selectedIds.toList(),
-            splitMode: _splitMode,
-            customAmounts: {
-              for (final id in _selectedIds)
-                id: double.tryParse(_amountCtrls[id]?.text ?? '') ?? 0,
-            },
-            weights: {
-              for (final id in _selectedIds)
-                id: double.tryParse(_weightCtrls[id]?.text ?? '0') ?? 0,
-            },
+            splitMode: 'equal',
           );
-          final payerAmounts = <String, double>{};
-          if (_payerIds.isNotEmpty) {
-            if (_multiPayer) {
-              for (final id in _payerIds) {
-                payerAmounts[id] =
-                    double.tryParse(_payerCtrls[id]?.text ?? '') ?? 0;
-              }
-            } else {
-              payerAmounts[_payerIds.first] = previewTotal;
-            }
-          }
 
           return GestureDetector(
             // Dismiss the keyboard when tapping outside any input field.
@@ -531,223 +280,78 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                   _LiveSplitPreview(
                     total: previewTotal,
                     shares: shares,
-                    payerAmounts: payerAmounts,
-                    payerIds: _payerIds,
+                    payerId: _payerId,
                     selectedIds: _selectedIds,
-                    splitMode: _splitMode,
                     participants: participants,
                     currency: _currency(),
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: _category,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
-                            border: OutlineInputBorder(),
-                          ),
-                          items: ExpenseCategory.all
-                              .map(
-                                (c) => DropdownMenuItem(
-                                  value: c,
-                                  child: Text('${ExpenseCategory.icons[c]} $c'),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (v) {
-                            if (v != null) setState(() => _category = v);
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: InkWell(
-                          onTap: _pickDate,
-                          borderRadius: BorderRadius.circular(4),
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Date',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.calendar_today),
-                            ),
-                            child: Text(formatDateShort(_date)),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
 
-                  // ---- Payer section ----
-                  const _SectionTitle(
-                    icon: Icons.payments_outlined,
-                    title: 'Who paid?',
-                  ),
-                  SegmentedButton<bool>(
-                    style: const ButtonStyle(
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    segments: const [
-                      ButtonSegment(
-                        value: false,
-                        label: Text('One person'),
-                        icon: Icon(Icons.person),
-                      ),
-                      ButtonSegment(
-                        value: true,
-                        label: Text('Multiple'),
-                        icon: Icon(Icons.groups),
-                      ),
-                    ],
-                    selected: {_multiPayer},
-                    onSelectionChanged: (s) =>
-                        setState(() => _multiPayer = s.first),
-                  ),
-                  const SizedBox(height: 12),
-                  if (!_multiPayer)
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: participants.map((p) {
-                        final selected = _payerIds.contains(p.id);
-                        return ChoiceChip(
-                          avatar: ParticipantAvatar(participant: p, radius: 13),
-                          label: Text(p.name),
-                          selected: selected,
-                          onSelected: (_) => setState(() {
-                            _payerIds
-                              ..clear()
-                              ..add(p.id);
-                          }),
-                        );
-                      }).toList(),
-                    )
-                  else
-                    Column(
-                      children: participants.map((p) {
-                        final checked = _payerIds.contains(p.id);
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                value: checked,
-                                onChanged: (v) => setState(() {
-                                  if (v ?? false) {
-                                    _payerIds.add(p.id);
-                                  } else {
-                                    _payerIds.remove(p.id);
-                                  }
-                                }),
-                              ),
-                              ParticipantAvatar(participant: p, radius: 15),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(p.name)),
-                              SizedBox(
-                                width: 110,
-                                child: TextField(
-                                  controller: _payerCtrls.putIfAbsent(
-                                    p.id,
-                                    () => TextEditingController(),
-                                  ),
-                                  enabled: checked,
-                                  onChanged: (_) => setState(() {}),
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                  decoration: const InputDecoration(
-                                    isDense: true,
-                                    border: OutlineInputBorder(),
-                                    hintText: '0',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  const SizedBox(height: 24),
-
-                  // ---- Split section ----
-                  const _SectionTitle(icon: Icons.call_split, title: 'Split'),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Shared expense (everyone)'),
-                    subtitle: Text(
-                      _shared
-                          ? 'Split equally among all members'
-                          : 'Choose who splits this expense',
-                    ),
-                    value: _shared,
-                    onChanged: (v) => _setShared(v),
-                  ),
-                  if (!_shared) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Split among: ${_selectedIds.length} of '
-                              '${participants.length} members selected',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => setState(() {
-                              _selectedIds
-                                ..clear()
-                                ..addAll(participants.map((p) => p.id));
-                            }),
-                            child: const Text('Select All'),
-                          ),
-                          TextButton(
-                            onPressed: () =>
-                                setState(() => _selectedIds.clear()),
-                            child: const Text('Deselect All'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ParticipantChipSelector(
-                      participants: participants,
-                      selectedIds: _selectedIds,
-                      onChanged: (ids) => setState(() {
-                        _selectedIds
-                          ..clear()
-                          ..addAll(ids);
-                      }),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      ChoiceChip(
-                        label: const Text('Split Equally'),
-                        avatar: const Icon(Icons.content_cut, size: 16),
-                        selected: _splitMode == SplitMode.equal,
-                        onSelected: (_) => _applyEqualSplit(),
-                      ),
-                      ChoiceChip(
-                        label: const Text('Custom Amounts'),
-                        selected: _splitMode == SplitMode.customAmount,
-                        onSelected: (_) => _enterCustomAmounts(),
-                      ),
-                      ChoiceChip(
-                        label: const Text('Weights'),
-                        selected: _splitMode == SplitMode.customWeight,
-                        onSelected: (_) => _enterWeights(),
-                      ),
-                    ],
+                  // ---- Who paid ----
+                  Text(
+                    'Who paid?',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
-                  _buildSplitInputs(participants),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: participants.map((p) {
+                      return ChoiceChip(
+                        avatar: ParticipantAvatar(participant: p, radius: 13),
+                        label: Text(p.name),
+                        selected: _payerId == p.id,
+                        onSelected: (_) => setState(() => _payerId = p.id),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ---- Participants who joined ----
+                  Text(
+                    'Who joined?',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Selected: ${_selectedIds.length} of '
+                            '${participants.length} members'
+                            '${previewTotal > 0 && _selectedIds.isNotEmpty
+                                ? ' (each ~ ${formatCurrency(previewTotal / _selectedIds.length, _currency())})'
+                                : ''}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => setState(() {
+                            _selectedIds
+                              ..clear()
+                              ..addAll(participants.map((p) => p.id));
+                          }),
+                          child: const Text('Select All'),
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              setState(() => _selectedIds.clear()),
+                          child: const Text('Deselect All'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ParticipantChipSelector(
+                    participants: participants,
+                    selectedIds: _selectedIds,
+                    onChanged: (ids) => setState(() {
+                      _selectedIds
+                        ..clear()
+                        ..addAll(ids);
+                    }),
+                  ),
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: _save,
@@ -774,149 +378,26 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
       ),
     );
   }
-
-  Widget _buildSplitInputs(List<Participant> participants) {
-    final total = _total() ?? 0;
-    final ids = _selectedIds.toList();
-    if (ids.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: Text('Select at least one participant above.'),
-      );
-    }
-
-    final isAmount = _splitMode == SplitMode.customAmount;
-    final isWeight = _splitMode == SplitMode.customWeight;
-
-    return Column(
-      children: ids.map((pid) {
-        final p = participants.firstWhere(
-          (e) => e.id == pid,
-          orElse: () => participants.first,
-        );
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  ParticipantAvatar(participant: p, radius: 14),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(p.name)),
-                  if (isAmount)
-                    SizedBox(
-                      width: 110,
-                      child: TextField(
-                        controller: _amountCtrls.putIfAbsent(
-                          pid,
-                          () => TextEditingController(),
-                        ),
-                        onChanged: (_) => setState(() {}),
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: OutlineInputBorder(),
-                          hintText: '0',
-                        ),
-                      ),
-                    )
-                  else if (isWeight)
-                    SizedBox(
-                      width: 110,
-                      child: TextField(
-                        controller: _weightCtrls.putIfAbsent(
-                          pid,
-                          () => TextEditingController(),
-                        ),
-                        onChanged: (_) => setState(() {}),
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: OutlineInputBorder(),
-                          hintText: 'weight',
-                        ),
-                      ),
-                    )
-                  else
-                    Text(
-                      '≈ ${formatCurrency(splitEqually(total: total, count: ids.length)[ids.indexOf(pid)], _currency())}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: TextField(
-                  controller: _noteCtrls.putIfAbsent(
-                    pid,
-                    () => TextEditingController(),
-                  ),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: 'Note for ${p.name} (optional)',
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(
-                      Icons.sticky_note_2_outlined,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  const _SectionTitle({required this.icon, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(width: 8),
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-        ],
-      ),
-    );
-  }
 }
 
 /// Reactive "on-the-spot" split preview.
 ///
 /// Rebuilds on every amount keystroke or participant toggle and shows exactly
-/// what each selected member owes for this single expense, plus each payer's
-/// net impact (credit for paying, minus their own share when participating).
+/// what each selected member owes for this single expense (equal split), plus
+/// the payer's net impact.
 class _LiveSplitPreview extends StatelessWidget {
   final double total;
   final Map<String, double> shares;
-  final Map<String, double> payerAmounts;
-  final Set<String> payerIds;
+  final String payerId;
   final Set<String> selectedIds;
-  final String splitMode;
   final List<Participant> participants;
   final String currency;
 
   const _LiveSplitPreview({
     required this.total,
     required this.shares,
-    required this.payerAmounts,
-    required this.payerIds,
+    required this.payerId,
     required this.selectedIds,
-    required this.splitMode,
     required this.participants,
     required this.currency,
   });
@@ -926,15 +407,6 @@ class _LiveSplitPreview extends StatelessWidget {
     final theme = Theme.of(context);
     final nameMap = {for (final p in participants) p.id: p};
     final k = selectedIds.length;
-
-    final customSum =
-        splitMode == SplitMode.customAmount
-            ? shares.values.fold(0.0, (a, b) => a + b)
-            : total;
-    final payerSum = payerAmounts.values.fold(0.0, (a, b) => a + b);
-    final amountsMismatch = total > 0 && (customSum - total).abs() > 0.01;
-    final payersMismatch =
-        total > 0 && payerIds.isNotEmpty && (payerSum - total).abs() > 0.01;
 
     return Card(
       child: Padding(
@@ -962,12 +434,11 @@ class _LiveSplitPreview extends StatelessWidget {
                 style: theme.textTheme.bodySmall,
               )
             else ...[
-              if (splitMode == SplitMode.equal)
-                Text(
-                  'Mỗi người đóng: ${formatCurrency(total / k, currency)} '
-                  '($k người tham gia)',
-                  style: theme.textTheme.titleMedium,
-                ),
+              Text(
+                'Mỗi người đóng: ${formatCurrency(total / k, currency)} '
+                '($k người tham gia)',
+                style: theme.textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               for (final id in selectedIds)
                 if (nameMap.containsKey(id))
@@ -985,48 +456,32 @@ class _LiveSplitPreview extends StatelessWidget {
                       ],
                     ),
                   ),
-              if (payerIds.isNotEmpty) ...[
+              if (nameMap.containsKey(payerId)) ...[
                 const SizedBox(height: 8),
                 const Divider(height: 1),
                 const SizedBox(height: 8),
-                for (final entry in payerAmounts.entries)
-                  if (nameMap.containsKey(entry.key))
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Row(
-                        children: [
-                          ParticipantAvatar(
-                            participant: nameMap[entry.key]!,
-                            radius: 12,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              '${nameMap[entry.key]!.name} paid '
-                              '${formatCurrency(entry.value, currency)}'
-                              '${selectedIds.contains(entry.key) ? '' : ' (không tham gia)'}',
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ),
-                          _netLabel(theme, entry.key, entry.value),
-                        ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      ParticipantAvatar(
+                        participant: nameMap[payerId]!,
+                        radius: 12,
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${nameMap[payerId]!.name} paid '
+                          '${formatCurrency(total, currency)}'
+                          '${selectedIds.contains(payerId) ? '' : ' (không tham gia)'}',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ),
+                      _netLabel(theme),
+                    ],
+                  ),
+                ),
               ],
-              if (amountsMismatch)
-                _banner(
-                  theme,
-                  'Tổng tiền chia (${formatCurrency(customSum, currency)}) '
-                  'không khớp với số tiền (${formatCurrency(total, currency)}).',
-                  isError: true,
-                ),
-              if (payersMismatch)
-                _banner(
-                  theme,
-                  'Tổng tiền trả (${formatCurrency(payerSum, currency)}) '
-                  'không khớp với số tiền (${formatCurrency(total, currency)}).',
-                  isError: true,
-                ),
             ],
           ],
         ),
@@ -1034,9 +489,9 @@ class _LiveSplitPreview extends StatelessWidget {
     );
   }
 
-  Widget _netLabel(ThemeData theme, String participantId, double paid) {
-    final share = shares[participantId] ?? 0;
-    final net = computePayerNetImpact(amountPaid: paid, shareObligation: share);
+  Widget _netLabel(ThemeData theme) {
+    final share = shares[payerId] ?? 0;
+    final net = computePayerNetImpact(amountPaid: total, shareObligation: share);
     final sign = net >= 0 ? '+' : '-';
     return Text(
       '$sign${formatCurrency(net.abs(), currency)}',

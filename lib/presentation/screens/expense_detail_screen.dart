@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants.dart';
 import '../../core/formatters.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
@@ -38,11 +37,10 @@ class ExpenseDetailScreen extends ConsumerWidget {
             'VND';
 
         final nameMap = {for (final p in participants) p.id: p.name};
-        final joinedIds = {
-          for (final s in details.splits) s.participantId,
-        };
         final excluded = participants
-            .where((p) => !joinedIds.contains(p.id))
+            .where(
+              (p) => !details.participants.any((e) => e.participantId == p.id),
+            )
             .toList();
 
         return Scaffold(
@@ -73,37 +71,32 @@ class ExpenseDetailScreen extends ConsumerWidget {
               _HeaderCard(
                 expense: expense,
                 currency: currency,
-                payerNames: details.payers
-                    .map((p) => nameMap[p.participantId] ?? 'Unknown')
-                    .toList(),
+                payerName: nameMap[expense.payerId] ?? 'Unknown',
               ),
               const SizedBox(height: 16),
               Text(
-                'Joined (${details.splits.length})',
+                'Joined (${details.participants.length})',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
               Card(
                 child: Column(
                   children: [
-                    for (final split in details.splits)
+                    for (final member in details.participants)
                       ListTile(
                         dense: true,
                         leading: ParticipantAvatar(
                           participant: _participantFor(
                             participants,
-                            split.participantId,
+                            member.participantId,
                           ),
                           radius: 15,
                         ),
                         title: Text(
-                          nameMap[split.participantId] ?? 'Unknown',
+                          nameMap[member.participantId] ?? 'Unknown',
                         ),
-                        subtitle: split.note == null
-                            ? null
-                            : Text(split.note!),
                         trailing: Text(
-                          formatCurrency(split.amount, currency),
+                          formatCurrency(member.shareAmount, currency),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -187,24 +180,13 @@ class ExpenseDetailScreen extends ConsumerWidget {
 class _HeaderCard extends StatelessWidget {
   final Expense expense;
   final String currency;
-  final List<String> payerNames;
+  final String payerName;
 
   const _HeaderCard({
     required this.expense,
     required this.currency,
-    required this.payerNames,
+    required this.payerName,
   });
-
-  String get _splitModeLabel {
-    switch (expense.splitMode) {
-      case SplitMode.customAmount:
-        return 'Custom amounts';
-      case SplitMode.customWeight:
-        return 'Split by weight';
-      default:
-        return 'Split equally';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,14 +216,7 @@ class _HeaderCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${ExpenseCategory.icons[expense.category] ?? ''} '
-              '$expense.category · $_splitModeLabel · '
-              '${formatDate(expense.date)}',
-              style: theme.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Paid by ${payerNames.join(', ')}',
+              'Split equally · Paid by $payerName',
               style: theme.textTheme.bodyMedium,
             ),
           ],

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:chiti/core/constants.dart';
 import 'package:chiti/data/models/models.dart';
 import 'package:chiti/data/repository.dart';
 import 'package:chiti/providers/providers.dart';
@@ -9,8 +8,7 @@ import 'package:chiti/providers/providers.dart';
 /// In-memory fake repository backing notifier tests without sqflite.
 class FakeAppRepository extends AppRepository {
   final List<Expense> expenses = [];
-  final Map<String, List<ExpensePayer>> payersByExpense = {};
-  final Map<String, List<ExpenseSplit>> splitsByExpense = {};
+  final Map<String, List<ExpenseParticipant>> joinedByExpense = {};
   final List<Settlement> settlements = [];
 
   @override
@@ -22,28 +20,20 @@ class FakeAppRepository extends AppRepository {
     required String tripId,
     required String title,
     required double amount,
-    required DateTime date,
-    required String category,
-    required String splitMode,
-    required List<ExpensePayer> payers,
-    required List<ExpenseSplit> splits,
+    required String payerId,
+    required List<ExpenseParticipant> participants,
   }) async {
     final e = Expense(
       id: 'exp-${expenses.length + 1}',
       tripId: tripId,
       title: title,
       amount: amount,
-      date: date,
-      category: category,
-      splitMode: splitMode,
+      payerId: payerId,
       createdAt: DateTime.now(),
     );
     expenses.add(e);
-    payersByExpense[e.id] = payers
+    joinedByExpense[e.id] = participants
         .map((p) => p.copyWith(expenseId: e.id))
-        .toList();
-    splitsByExpense[e.id] = splits
-        .map((s) => s.copyWith(expenseId: e.id))
         .toList();
     return e;
   }
@@ -51,59 +41,44 @@ class FakeAppRepository extends AppRepository {
   @override
   Future<void> updateExpense({
     required Expense expense,
-    required List<ExpensePayer> payers,
-    required List<ExpenseSplit> splits,
+    required List<ExpenseParticipant> participants,
   }) async {
     final index = expenses.indexWhere((e) => e.id == expense.id);
     if (index == -1) throw StateError('expense not found');
     expenses[index] = expense;
-    payersByExpense[expense.id] = payers
+    joinedByExpense[expense.id] = participants
         .map((p) => p.copyWith(expenseId: expense.id))
-        .toList();
-    splitsByExpense[expense.id] = splits
-        .map((s) => s.copyWith(expenseId: expense.id))
         .toList();
   }
 
   @override
   Future<void> deleteExpense(String id) async {
     expenses.removeWhere((e) => e.id == id);
-    payersByExpense.remove(id);
-    splitsByExpense.remove(id);
+    joinedByExpense.remove(id);
   }
 
   @override
-  Future<List<ExpensePayer>> getExpensePayers(String expenseId) async =>
-      List.of(payersByExpense[expenseId] ?? const []);
+  Future<List<ExpenseParticipant>> getExpenseParticipants(
+    String expenseId,
+  ) async => List.of(joinedByExpense[expenseId] ?? const []);
 
   @override
-  Future<List<ExpenseSplit>> getExpenseSplits(String expenseId) async =>
-      List.of(splitsByExpense[expenseId] ?? const []);
-
-  @override
-  Future<ExpenseWithSplits?> getExpenseDetails(String expenseId) async {
+  Future<ExpenseWithParticipants?> getExpenseDetails(String expenseId) async {
     final match = expenses.where((e) => e.id == expenseId).toList();
     if (match.isEmpty) return null;
-    return ExpenseWithSplits(
+    return ExpenseWithParticipants(
       expense: match.first,
-      payers: List.of(payersByExpense[expenseId] ?? const []),
-      splits: List.of(splitsByExpense[expenseId] ?? const []),
+      participants: List.of(joinedByExpense[expenseId] ?? const []),
     );
   }
 
   @override
-  Future<List<ExpensePayer>> getPayersForTrip(String tripId) async {
+  Future<List<ExpenseParticipant>> getParticipantsForTrip(
+    String tripId,
+  ) async {
     final ids = expenses.where((e) => e.tripId == tripId).map((e) => e.id);
     return [
-      for (final id in ids) ...payersByExpense[id] ?? const [],
-    ];
-  }
-
-  @override
-  Future<List<ExpenseSplit>> getSplitsForTrip(String tripId) async {
-    final ids = expenses.where((e) => e.tripId == tripId).map((e) => e.id);
-    return [
-      for (final id in ids) ...splitsByExpense[id] ?? const [],
+      for (final id in ids) ...joinedByExpense[id] ?? const [],
     ];
   }
 
@@ -137,8 +112,7 @@ void main() {
     );
     // Keep the autoDispose derived providers alive during the test so they are
     // not disposed while an in-flight future is still loading.
-    container.listen(payersForTripProvider(tripId), (_, _) {});
-    container.listen(splitsForTripProvider(tripId), (_, _) {});
+    container.listen(expenseParticipantsForTripProvider(tripId), (_, _) {});
     container.listen(summaryProvider(tripId), (_, _) {});
     addTearDown(container.dispose);
   });
@@ -148,35 +122,25 @@ void main() {
     tripId: tripId,
     title: 'Dinner',
     amount: 100,
-    date: DateTime(2026, 8, 22),
-    category: 'Food',
-    splitMode: SplitMode.equal,
+    payerId: payerId,
     createdAt: DateTime(2026, 8, 22),
   );
 
   setUpExpense() {
     final e = initialExpense();
     repo.expenses.add(e);
-    repo.payersByExpense[e.id] = [
-      ExpensePayer(
-        id: 'payer-1',
+    repo.joinedByExpense[e.id] = [
+      ExpenseParticipant(
+        id: 'ep-1',
         expenseId: e.id,
         participantId: payerId,
-        amount: 100,
+        shareAmount: 50,
       ),
-    ];
-    repo.splitsByExpense[e.id] = [
-      ExpenseSplit(
-        id: 'split-1',
-        expenseId: e.id,
-        participantId: payerId,
-        amount: 50,
-      ),
-      ExpenseSplit(
-        id: 'split-2',
+      ExpenseParticipant(
+        id: 'ep-2',
         expenseId: e.id,
         participantId: otherId,
-        amount: 50,
+        shareAmount: 50,
       ),
     ];
     return e;
@@ -190,26 +154,18 @@ void main() {
     final updated = initialExpense().copyWith(title: 'Late dinner', amount: 80);
     await notifier.updateExpense(
       expense: updated,
-      payers: [
-        ExpensePayer(
-          id: 'payer-new',
+      participants: [
+        ExpenseParticipant(
+          id: 'ep-new-1',
           expenseId: '',
           participantId: payerId,
-          amount: 80,
+          shareAmount: 40,
         ),
-      ],
-      splits: [
-        ExpenseSplit(
-          id: 's-new-1',
-          expenseId: '',
-          participantId: payerId,
-          amount: 40,
-        ),
-        ExpenseSplit(
-          id: 's-new-2',
+        ExpenseParticipant(
+          id: 'ep-new-2',
           expenseId: '',
           participantId: otherId,
-          amount: 40,
+          shareAmount: 40,
         ),
       ],
     );
@@ -219,12 +175,12 @@ void main() {
     expect(items.first.title, 'Late dinner');
     expect(items.first.amount, 80);
 
-    // Downstream payers/splits providers recomputed after the edit.
-    final payers = await container.read(
-      payersForTripProvider(tripId).future,
+    // Downstream joined provider recomputed after the edit.
+    final joined = await container.read(
+      expenseParticipantsForTripProvider(tripId).future,
     );
-    expect(payers, hasLength(1));
-    expect(payers.first.amount, 80);
+    expect(joined, hasLength(2));
+    expect(joined.first.shareAmount, 40);
 
     // Settlement plan regenerated.
     final settlements = container.read(settlementsProvider(tripId)).valueOrNull;
@@ -239,8 +195,10 @@ void main() {
     await notifier.deleteExpense('exp-9');
 
     expect(container.read(expensesProvider(tripId)).requireValue, isEmpty);
-    final payers = await container.read(payersForTripProvider(tripId).future);
-    expect(payers, isEmpty);
+    final joined = await container.read(
+      expenseParticipantsForTripProvider(tripId).future,
+    );
+    expect(joined, isEmpty);
   });
 
   test('settlement calculation uses updated balance after edit', () async {
@@ -251,27 +209,22 @@ void main() {
 
     // Edit: other person now paid the whole 100 (was payer). Net flips.
     await notifier.updateExpense(
-      expense: initialExpense().copyWith(title: 'Reassigned payment'),
-      payers: [
-        ExpensePayer(
-          id: 'payer-new',
-          expenseId: '',
-          participantId: otherId,
-          amount: 100,
-        ),
-      ],
-      splits: [
-        ExpenseSplit(
-          id: 's-new-1',
+      expense: initialExpense().copyWith(
+        title: 'Reassigned payment',
+        payerId: otherId,
+      ),
+      participants: [
+        ExpenseParticipant(
+          id: 'ep-new-1',
           expenseId: '',
           participantId: payerId,
-          amount: 50,
+          shareAmount: 50,
         ),
-        ExpenseSplit(
-          id: 's-new-2',
+        ExpenseParticipant(
+          id: 'ep-new-2',
           expenseId: '',
           participantId: otherId,
-          amount: 50,
+          shareAmount: 50,
         ),
       ],
     );
@@ -284,7 +237,7 @@ void main() {
     expect(other.net, closeTo(50, 0.01));
   });
 
-  test('expenseDetailsProvider returns bundled expense, payers and splits',
+  test('expenseDetailsProvider returns bundled expense and joined members',
       () async {
     setUpExpense();
 
@@ -293,8 +246,7 @@ void main() {
 
     expect(details, isNotNull);
     expect(details!.expense.title, 'Dinner');
-    expect(details.payers, hasLength(1));
-    expect(details.splits, hasLength(2));
+    expect(details.participants, hasLength(2));
 
     // Unknown id resolves to null.
     final missing =

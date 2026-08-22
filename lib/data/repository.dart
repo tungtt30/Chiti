@@ -113,22 +113,19 @@ class AppRepository {
       'expenses',
       where: 'trip_id = ?',
       whereArgs: [tripId],
-      orderBy: 'date DESC, created_at DESC',
+      orderBy: 'created_at DESC',
     );
     return maps.map((m) => Expense.fromMap(m)).toList();
   }
 
-  /// Creates an expense together with its payers and split rows in a single
-  /// transaction.
+  /// Creates an expense together with its participating member rows in a
+  /// single transaction.
   Future<Expense> createExpense({
     required String tripId,
     required String title,
     required double amount,
-    required DateTime date,
-    required String category,
-    required String splitMode,
-    required List<ExpensePayer> payers,
-    required List<ExpenseSplit> splits,
+    required String payerId,
+    required List<ExpenseParticipant> participants,
   }) async {
     final db = await _helper.database;
     final expense = Expense(
@@ -136,45 +133,31 @@ class AppRepository {
       tripId: tripId,
       title: title,
       amount: amount,
-      date: date,
-      category: category,
-      splitMode: splitMode,
+      payerId: payerId,
       createdAt: DateTime.now(),
     );
 
     await db.transaction((txn) async {
       await txn.insert('expenses', expense.toMap());
 
-      final payerBatch = txn.batch();
-      for (final payer in payers) {
-        payerBatch.insert(
-          'expense_payers',
-          payer.copyWith(expenseId: expense.id).toMap(),
+      final batch = txn.batch();
+      for (final participant in participants) {
+        batch.insert(
+          'expense_participants',
+          participant.copyWith(expenseId: expense.id).toMap(),
         );
       }
-      await payerBatch.commit(noResult: true);
-
-      final splitBatch = txn.batch();
-      for (final split in splits) {
-        splitBatch.insert(
-          'expense_splits',
-          split.copyWith(expenseId: expense.id).toMap(),
-        );
-      }
-      await splitBatch.commit(noResult: true);
+      await batch.commit(noResult: true);
     });
 
     return expense;
   }
 
-  /// Updates an expense row and replaces its payer / split rows in a single
-  /// transaction. Old child rows are deleted and re-inserted wholesale because
-  /// they carry their own UUIDs and the clearest push-based refresh is to
-  /// recreate them.
+  /// Updates an expense row and replaces its participating-member rows in a
+  /// single transaction (child rows are recreated wholesale).
   Future<void> updateExpense({
     required Expense expense,
-    required List<ExpensePayer> payers,
-    required List<ExpenseSplit> splits,
+    required List<ExpenseParticipant> participants,
   }) async {
     final db = await _helper.database;
     await db.transaction((txn) async {
@@ -186,33 +169,19 @@ class AppRepository {
       );
 
       await txn.delete(
-        'expense_payers',
-        where: 'expense_id = ?',
-        whereArgs: [expense.id],
-      );
-      await txn.delete(
-        'expense_splits',
+        'expense_participants',
         where: 'expense_id = ?',
         whereArgs: [expense.id],
       );
 
-      final payerBatch = txn.batch();
-      for (final payer in payers) {
-        payerBatch.insert(
-          'expense_payers',
-          payer.copyWith(expenseId: expense.id).toMap(),
+      final batch = txn.batch();
+      for (final participant in participants) {
+        batch.insert(
+          'expense_participants',
+          participant.copyWith(expenseId: expense.id).toMap(),
         );
       }
-      await payerBatch.commit(noResult: true);
-
-      final splitBatch = txn.batch();
-      for (final split in splits) {
-        splitBatch.insert(
-          'expense_splits',
-          split.copyWith(expenseId: expense.id).toMap(),
-        );
-      }
-      await splitBatch.commit(noResult: true);
+      await batch.commit(noResult: true);
     });
   }
 
@@ -221,9 +190,9 @@ class AppRepository {
     await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
   }
 
-  /// Returns an expense together with its payers and splits, or null when the
-  /// expense no longer exists.
-  Future<ExpenseWithSplits?> getExpenseDetails(String expenseId) async {
+  /// Returns an expense together with its participating members, or null when
+  /// the expense no longer exists.
+  Future<ExpenseWithParticipants?> getExpenseDetails(String expenseId) async {
     final db = await _helper.database;
     final maps = await db.query(
       'expenses',
@@ -232,61 +201,37 @@ class AppRepository {
     );
     if (maps.isEmpty) return null;
     final expense = Expense.fromMap(maps.first);
-    return ExpenseWithSplits(
+    return ExpenseWithParticipants(
       expense: expense,
-      payers: await getExpensePayers(expenseId),
-      splits: await getExpenseSplits(expenseId),
+      participants: await getExpenseParticipants(expenseId),
     );
   }
 
-  // ---- Expense payers ----
+  // ---- Expense participants ----
 
-  Future<List<ExpensePayer>> getExpensePayers(String expenseId) async {
+  Future<List<ExpenseParticipant>> getExpenseParticipants(
+    String expenseId,
+  ) async {
     final db = await _helper.database;
     final maps = await db.query(
-      'expense_payers',
+      'expense_participants',
       where: 'expense_id = ?',
       whereArgs: [expenseId],
     );
-    return maps.map((m) => ExpensePayer.fromMap(m)).toList();
+    return maps.map((m) => ExpenseParticipant.fromMap(m)).toList();
   }
 
-  Future<List<ExpensePayer>> getPayersForTrip(String tripId) async {
+  Future<List<ExpenseParticipant>> getParticipantsForTrip(String tripId) async {
     final db = await _helper.database;
     final maps = await db.rawQuery(
       '''
-      SELECT ep.* FROM expense_payers ep
+      SELECT ep.* FROM expense_participants ep
       INNER JOIN expenses e ON ep.expense_id = e.id
       WHERE e.trip_id = ?
     ''',
       [tripId],
     );
-    return maps.map((m) => ExpensePayer.fromMap(m)).toList();
-  }
-
-  // ---- Expense splits ----
-
-  Future<List<ExpenseSplit>> getExpenseSplits(String expenseId) async {
-    final db = await _helper.database;
-    final maps = await db.query(
-      'expense_splits',
-      where: 'expense_id = ?',
-      whereArgs: [expenseId],
-    );
-    return maps.map((m) => ExpenseSplit.fromMap(m)).toList();
-  }
-
-  Future<List<ExpenseSplit>> getSplitsForTrip(String tripId) async {
-    final db = await _helper.database;
-    final maps = await db.rawQuery(
-      '''
-      SELECT es.* FROM expense_splits es
-      INNER JOIN expenses e ON es.expense_id = e.id
-      WHERE e.trip_id = ?
-    ''',
-      [tripId],
-    );
-    return maps.map((m) => ExpenseSplit.fromMap(m)).toList();
+    return maps.map((m) => ExpenseParticipant.fromMap(m)).toList();
   }
 
   // ---- Settlements ----

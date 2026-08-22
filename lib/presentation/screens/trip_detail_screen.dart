@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/formatters.dart';
-import '../../core/constants.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
-import '../widgets/summary_table.dart';
+import '../widgets/net_balance_list.dart';
 import '../widgets/settlement_card.dart';
 import 'add_edit_expense_screen.dart';
 import 'add_trip_screen.dart';
@@ -89,7 +88,7 @@ class _ExpensesTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final expensesAsync = ref.watch(expensesProvider(tripId));
     final participantsAsync = ref.watch(participantsProvider(tripId));
-    final payersAsync = ref.watch(payersForTripProvider(tripId));
+    final joinedAsync = ref.watch(expenseParticipantsForTripProvider(tripId));
 
     return expensesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -123,9 +122,10 @@ class _ExpensesTab extends ConsumerWidget {
 
         final participants = participantsAsync.valueOrNull ?? [];
         final nameMap = {for (final p in participants) p.id: p.name};
-        final payerMap = <String, List<ExpensePayer>>{};
-        for (final payer in payersAsync.valueOrNull ?? []) {
-          payerMap.putIfAbsent(payer.expenseId, () => []).add(payer);
+        final joinedCount = <String, int>{};
+        for (final member in joinedAsync.valueOrNull ?? <ExpenseParticipant>[]) {
+          joinedCount[member.expenseId] =
+              (joinedCount[member.expenseId] ?? 0) + 1;
         }
 
         return ListView.builder(
@@ -133,10 +133,8 @@ class _ExpensesTab extends ConsumerWidget {
           itemCount: expenses.length,
           itemBuilder: (context, index) {
             final e = expenses[index];
-            final payers = payerMap[e.id] ?? [];
-            final payerLabel = payers
-                .map((p) => nameMap[p.participantId] ?? 'Unknown')
-                .join(', ');
+            final payerLabel = nameMap[e.payerId] ?? 'Unknown';
+            final joined = joinedCount[e.id] ?? 0;
 
             return Dismissible(
               key: Key(e.id),
@@ -160,10 +158,8 @@ class _ExpensesTab extends ConsumerWidget {
                   ),
                 ),
                 title: Text(e.title),
-                subtitle: Text(
-                  '${ExpenseCategory.icons[e.category] ?? ''} ${e.category} · '
-                  'Paid by $payerLabel · ${formatDate(e.date)}',
-                ),
+                subtitle: Text('Paid by $payerLabel · $joined of '
+                    '${participants.length} joined'),
                 trailing: Text(
                   formatCurrency(e.amount, currency),
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -205,7 +201,7 @@ class _SummaryTab extends ConsumerWidget {
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Text(
-            'Summary Table',
+            'Net Balance',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
@@ -223,7 +219,11 @@ class _SummaryTab extends ConsumerWidget {
                   padding: EdgeInsets.all(24),
                   child: Center(child: Text('No data yet. Add expenses.')),
                 )
-              : SummaryTable(rows: rows, currency: currency),
+              : NetBalanceList(
+                  rows: rows,
+                  participants: participants,
+                  currency: currency,
+                ),
         ),
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 24, 16, 8),

@@ -184,34 +184,29 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
   Future<void> createExpense({
     required String title,
     required double amount,
-    required DateTime date,
-    required String category,
-    required String splitMode,
-    required List<ExpensePayer> payers,
-    required List<ExpenseSplit> splits,
+    required String payerId,
+    required List<ExpenseParticipant> participants,
   }) async {
     await _repo.createExpense(
       tripId: tripId,
       title: title,
       amount: amount,
-      date: date,
-      category: category,
-      splitMode: splitMode,
-      payers: payers,
-      splits: splits,
+      payerId: payerId,
+      participants: participants,
     );
     await load();
+    // Recompute the who-owes-whom plan so balances reflect the new expense
+    // immediately (matches update/delete behaviour).
+    await ref.read(settlementsProvider(tripId).notifier).recalculate();
   }
 
   Future<void> updateExpense({
     required Expense expense,
-    required List<ExpensePayer> payers,
-    required List<ExpenseSplit> splits,
+    required List<ExpenseParticipant> participants,
   }) async {
     await _repo.updateExpense(
       expense: expense,
-      payers: payers,
-      splits: splits,
+      participants: participants,
     );
     await load();
     // Recompute the who-owes-whom plan so balances reflect the edit immediately.
@@ -228,40 +223,38 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
 
 // ---- Derived scores for a trip ----
 
-/// Single expense bundled with its payers and split rows (detail view).
+/// Single expense bundled with its participating members (detail view).
 final expenseDetailsProvider = FutureProvider.autoDispose
-    .family<ExpenseWithSplits?, String>((ref, expenseId) {
+    .family<ExpenseWithParticipants?, String>((ref, expenseId) {
       return ref.read(repositoryProvider).getExpenseDetails(expenseId);
     });
 
-/// Amount each participant paid across all expenses (one row per payer).
-final payersForTripProvider = FutureProvider.autoDispose
-    .family<List<ExpensePayer>, String>((ref, tripId) async {
+/// Share obligation per participant across all expense_participants rows.
+final expenseParticipantsForTripProvider = FutureProvider.autoDispose
+    .family<List<ExpenseParticipant>, String>((ref, tripId) async {
       ref.watch(expensesProvider(tripId));
-      return ref.read(repositoryProvider).getPayersForTrip(tripId);
-    });
-
-/// Obligation per participant across all split rows.
-final splitsForTripProvider = FutureProvider.autoDispose
-    .family<List<ExpenseSplit>, String>((ref, tripId) async {
-      ref.watch(expensesProvider(tripId));
-      return ref.read(repositoryProvider).getSplitsForTrip(tripId);
+      return ref.read(repositoryProvider).getParticipantsForTrip(tripId);
     });
 
 /// Ordered summary rows for the dashboard table.
 final summaryProvider = FutureProvider.autoDispose
     .family<List<SummaryRow>, String>((ref, tripId) async {
       // Each `ref.watch` below subscribes this provider to changes in the
-      // participants / expenses notifiers, so the summary recomputes automatically.
+      // participants / expenses notifiers, so the summary recomputes
+      // automatically.
       final participantsAsync = ref.watch(participantsProvider(tripId));
-      ref.watch(expensesProvider(tripId));
-      final payersAsync = ref.watch(payersForTripProvider(tripId));
-      final splitsAsync = ref.watch(splitsForTripProvider(tripId));
+      final expensesAsync = ref.watch(expensesProvider(tripId));
+      final participantsJoinedAsync = ref.watch(
+        expenseParticipantsForTripProvider(tripId),
+      );
 
       final participants =
           participantsAsync.valueOrNull ?? const <Participant>[];
-      final payers = payersAsync.valueOrNull ?? const <ExpensePayer>[];
-      final splits = splitsAsync.valueOrNull ?? const <ExpenseSplit>[];
+      final expenses =
+          expensesAsync.valueOrNull ?? const <Expense>[];
+      final joined =
+          participantsJoinedAsync.valueOrNull ??
+          const <ExpenseParticipant>[];
 
       final totalPaid = <String, double>{};
       final totalShare = <String, double>{};
@@ -270,13 +263,15 @@ final summaryProvider = FutureProvider.autoDispose
         totalShare[p.id] = 0;
       }
 
-      for (final payer in payers) {
-        totalPaid[payer.participantId] =
-            (totalPaid[payer.participantId] ?? 0) + payer.amount;
+      // Paid: the single payer of each expense covers its full amount.
+      for (final expense in expenses) {
+        totalPaid[expense.payerId] =
+            (totalPaid[expense.payerId] ?? 0) + expense.amount;
       }
-      for (final split in splits) {
-        totalShare[split.participantId] =
-            (totalShare[split.participantId] ?? 0) + split.amount;
+      // Obligation: only participants who joined incur a share.
+      for (final member in joined) {
+        totalShare[member.participantId] =
+            (totalShare[member.participantId] ?? 0) + member.shareAmount;
       }
 
       return buildSummary(
