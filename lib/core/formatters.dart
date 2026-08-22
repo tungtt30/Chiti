@@ -36,8 +36,9 @@ String formatMoney(double amount, String currencyCode) {
   return formatCurrency(amount, currencyCode);
 }
 
-/// e.g. `Aug 22, 2026`.
-String formatDate(DateTime date) => DateFormat.yMMMd().format(date);
+/// e.g. `Aug 22, 2026`. `locale` (e.g. 'vi') switches the date format.
+String formatDate(DateTime date, [String? locale]) =>
+    DateFormat.yMMMd(locale).format(date);
 
 /// e.g. `2026-08-22` for input fields.
 String formatDateCompact(DateTime date) =>

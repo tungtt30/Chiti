@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants.dart';
 import '../../data/models/models.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/providers.dart';
 import '../widgets/participant_chips.dart';
 
@@ -13,9 +14,10 @@ class ManageParticipantsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final participantsAsync = ref.watch(participantsProvider(tripId));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Members & Notes')),
+      appBar: AppBar(title: Text(l10n.membersAndNotesTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showEditDialog(
           context,
@@ -26,11 +28,11 @@ class ManageParticipantsScreen extends ConsumerWidget {
                   kParticipantColors.length],
         ),
         icon: const Icon(Icons.person_add),
-        label: const Text('Add Member'),
+        label: Text(l10n.addMember),
       ),
       body: participantsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(l10n.errorLabel(e.toString()))),
         data: (participants) {
           if (participants.isEmpty) {
             return Center(
@@ -45,12 +47,12 @@ class ManageParticipantsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No participants yet',
+                    l10n.noParticipantsYet,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Add the group so you can split expenses',
+                    l10n.noParticipantsHint,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
@@ -92,7 +94,7 @@ class ManageParticipantsScreen extends ConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 2),
                           child: Text(
-                            'No note yet',
+                            l10n.memberNotePlaceholder,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: Theme.of(context).disabledColor,
@@ -105,13 +107,13 @@ class ManageParticipantsScreen extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        tooltip: 'Edit',
+                        tooltip: l10n.editAction,
                         icon: const Icon(Icons.edit_outlined),
                         onPressed: () =>
                             _showEditDialog(context, ref, existing: p),
                       ),
                       IconButton(
-                        tooltip: 'Remove',
+                        tooltip: l10n.removeAction,
                         icon: const Icon(
                           Icons.remove_circle,
                           color: Colors.red,
@@ -134,21 +136,20 @@ class ManageParticipantsScreen extends ConsumerWidget {
     WidgetRef ref,
     Participant p,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Remove participant?'),
-        content: Text(
-          'Remove ${p.name} from this trip?\nTheir shares and payers will be removed too.',
-        ),
+        title: Text(l10n.removeParticipantTitle),
+        content: Text(l10n.removeParticipantContent(p.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.remove, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -252,8 +253,9 @@ class _EditParticipantDialogState extends State<EditParticipantDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(widget.existing == null ? 'Add Member' : 'Edit Member'),
+      title: Text(widget.existing == null ? l10n.addMember : l10n.editMember),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -262,37 +264,37 @@ class _EditParticipantDialogState extends State<EditParticipantDialog> {
             children: [
               TextFormField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.nameField,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Required' : null,
+                    (v == null || v.trim().isEmpty) ? l10n.required : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _contactCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Contact (optional)',
-                  hintText: 'Phone / email / handle',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.contactOptional,
+                  hintText: l10n.contactHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _noteCtrl,
                 maxLines: 2,
-                decoration: const InputDecoration(
-                  labelText: 'Note for this trip (optional)',
-                  hintText: 'e.g. Paid deposit early, vegetarian discount…',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.noteForTripOptional,
+                  hintText: l10n.noteHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Avatar color',
+                  l10n.avatarColor,
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
               ),
@@ -324,7 +326,7 @@ class _EditParticipantDialogState extends State<EditParticipantDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         FilledButton(
           onPressed: () {
@@ -343,7 +345,7 @@ class _EditParticipantDialogState extends State<EditParticipantDialog> {
               ),
             );
           },
-          child: const Text('Save'),
+          child: Text(l10n.save),
         ),
       ],
     );

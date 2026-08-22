@@ -1,0 +1,412 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Chiti",
+  "@appTitle": {
+    "description": "Application title."
+  },
+
+  "cancel": "Cancel",
+  "save": "Save",
+  "saveChanges": "Save Changes",
+  "delete": "Delete",
+  "remove": "Remove",
+  "required": "Required",
+  "unknown": "Unknown",
+  "errorLabel": "Error: {error}",
+  "@errorLabel": {
+    "description": "Error placeholder text.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "settingsTitle": "Settings",
+  "languageSectionTitle": "Language",
+  "systemDefault": "System default",
+  "englishLanguage": "English",
+  "vietnameseLanguage": "Tiếng Việt",
+
+  "myTrips": "My Trips",
+  "noTripsYet": "No trips yet",
+  "noTripsHint": "Tap + to create your first trip",
+  "newTrip": "New Trip",
+  "deleteTripTitle": "Delete trip?",
+  "deleteTripContent": "Remove \"{tripName}\" and all its expenses?",
+  "@deleteTripContent": {
+    "placeholders": {
+      "tripName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "tabExpenses": "Expenses",
+  "tabMembersAndNotes": "Members & Notes",
+  "tabSummary": "Summary",
+  "editTrip": "Edit Trip",
+  "tripNotFound": "Trip not found",
+  "noExpensesYet": "No expenses yet",
+  "noExpensesHint": "Tap + to add an expense",
+  "expenseSubtitle": "Paid by {paidBy} · {joined} of {total} joined",
+  "@expenseSubtitle": {
+    "placeholders": {
+      "paidBy": {
+        "type": "String"
+      },
+      "joined": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+
+  "createTrip": "Create Trip",
+  "tripName": "Trip Name",
+  "destination": "Destination",
+  "currency": "Currency",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+
+  "addExpense": "Add Expense",
+  "editExpense": "Edit Expense",
+  "saveExpense": "Save Expense",
+  "deleteExpense": "Delete Expense",
+  "deleteExpenseDialogTitle": "Delete expense?",
+  "deleteExpenseDialogContent": "Delete \"{title}\"? This cannot be undone.",
+  "@deleteExpenseDialogContent": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseTitle": "Title",
+  "expenseTitleHint": "Dinner at Beach, Grab to Hotel…",
+  "amount": "Amount",
+  "amountMustBePositive": "Must be > 0",
+  "category": "Category",
+  "whoPaid": "Who paid?",
+  "whoJoined": "Who joined?",
+  "selectedOfMembers": "Selected: {selected} of {total} members",
+  "@selectedOfMembers": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "eachApprox": " (each ~ {amount})",
+  "@eachApprox": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "selectAll": "Select All",
+  "deselectAll": "Deselect All",
+  "liveSplitPreview": "Live Split Preview",
+  "eachPaysPreview": "Each person pays: {amount}",
+  "@eachPaysPreview": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "participantsCount": "({count} participants)",
+  "@participantsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "payerSummary": "{name} paid {amount}{suffix}",
+  "@payerSummary": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
+    }
+  },
+  "notJoinedSuffix": " (not joined)",
+  "amountGreaterThanZero": "Amount must be greater than 0",
+  "selectParticipantToSplit": "Select at least one participant to split",
+  "selectWhoPaid": "Select who paid",
+  "addParticipantsFirst": "Add participants first",
+  "joinPreviewText": "No participants selected. Select who joined this expense.",
+  "enterAmountPreview": "Enter an amount to see the split right away.",
+
+  "membersAndNotesTitle": "Members & Notes",
+  "addMember": "Add Member",
+  "editMember": "Edit Member",
+  "noParticipantsYet": "No participants yet",
+  "noParticipantsHint": "Add the group so you can split expenses",
+  "memberNotePlaceholder": "No note yet",
+  "editAction": "Edit",
+  "removeAction": "Remove",
+  "removeParticipantTitle": "Remove participant?",
+  "removeParticipantContent": "Remove {name} from this trip?\nTheir shares and payers will be removed too.",
+  "@removeParticipantContent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nameField": "Name",
+  "contactOptional": "Contact (optional)",
+  "contactHint": "Phone / email / handle",
+  "noteForTripOptional": "Note for this trip (optional)",
+  "noteHint": "e.g. Paid deposit early, vegetarian discount…",
+  "avatarColor": "Avatar color",
+
+  "expenseDetails": "Expense Details",
+  "expenseNotFound": "Expense not found",
+  "joinedCount": "Joined ({count})",
+  "@joinedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "excludedCount": "Excluded ({count})",
+  "@excludedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "everyoneJoined": "Everyone joined this expense.",
+  "noShare": "No share",
+  "splitEquallyPaidBy": "Split equally · Paid by {payer}",
+  "@splitEquallyPaidBy": {
+    "placeholders": {
+      "payer": {
+        "type": "String"
+      }
+    }
+  },
+
+  "memberAuditTitle": "Member Audit",
+  "categoryAnalysisTitle": "Category Analysis",
+  "settlementPlanTitle": "Settlement Plan",
+  "recalculate": "Recalculate",
+  "allSettledNoTransfer": "All settled, no transfers needed 🎉",
+  "paidProgress": "Paid: {count} of {total}",
+  "@paidProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "copyTripReport": "Copy trip report",
+  "reportCopied": "Trip report copied",
+  "statsEmptyTitle": "No expenses yet",
+  "statsEmptyHint": "Add expenses to see statistics and the payment plan.",
+  "kpiTotalSpent": "Total spent",
+  "kpiAveragePerPerson": "Avg / person",
+  "kpiExpenseCount": "Expenses",
+  "kpiLargestExpense": "Largest expense",
+  "auditMember": "Member",
+  "auditPaid": "Paid",
+  "auditOwes": "Owes",
+  "auditNetRule": "Net balance = Paid − Owes",
+  "netReceiveBack": "+ Receive back {amount}",
+  "@netReceiveBack": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "netPayMore": "- Pay more {amount}",
+  "@netPayMore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "netSettled": "Settled",
+  "noCategoryData": "No category data yet.",
+  "billsParticipation": "{joined}/{total} bills",
+  "@billsParticipation": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "transferLine": "{from} pays {to}: {amount}",
+  "@transferLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "transferStatusSettled": "Settled",
+  "transferStatusPending": "Not settled",
+  "copyText": "Copy",
+  "copiedToClipboard": "Copied to clipboard",
+
+  "reportTitle": "TRIP REPORT \"{tripName}\"",
+  "@reportTitle": {
+    "placeholders": {
+      "tripName": {
+        "type": "String"
+      }
+    }
+  },
+  "reportTotalAverage": "Total spent: {amount} · Average: {average}/person",
+  "@reportTotalAverage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "reportMembersHeader": "Members:",
+  "reportMemberLine": "• {name} — paid: {paid} · spent: {spent} · joined {joined}/{total} bills · {net}",
+  "@reportMemberLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "paid": {
+        "type": "String"
+      },
+      "spent": {
+        "type": "String"
+      },
+      "joined": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "net": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetReceiveBack": "receive back +{amount}",
+  "@reportNetReceiveBack": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetPayMore": "pay more {amount}",
+  "@reportNetPayMore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetSettled": "settled",
+  "reportCategoriesHeader": "Spending by category:",
+  "reportCategoryLine": "• {emoji} {label}: {amount} ({percent}%)",
+  "@reportCategoryLine": {
+    "placeholders": {
+      "emoji": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSettlementsHeader": "Payments:",
+  "reportAllSettled": "• All settled, no transfers needed 🎉",
+  "reportSettlementLine": "• {from} transfers to {to}: {amount}{paid}",
+  "@reportSettlementLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "paid": {
+        "type": "String"
+      }
+    }
+  },
+  "reportPaidProgress": "✅ Paid: {count}/{total}",
+  "@reportPaidProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "transferReportLine": "{from} to {to}: {amount}",
+  "@transferReportLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "categoryFood": "Food",
+  "categoryTransport": "Transport",
+  "categoryLodging": "Lodging",
+  "categoryActivities": "Activities",
+  "categoryOther": "Other"
+}

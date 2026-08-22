@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/formatters.dart';
 import '../../../core/trip_report_text.dart';
 import '../../../data/models/models.dart';
+import '../../../l10n/app_localizations.dart';
 import '../participant_chips.dart';
 
 /// Section D — One optimized settlement transfer with copy action and settled
@@ -40,13 +41,14 @@ class TransferCard extends StatelessWidget {
     await Clipboard.setData(ClipboardData(text: text));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã sao chép vào clipboard')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.copiedToClipboard)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final settled = settlement.isPaid;
     final from = fromAvatar ?? _fallback;
     final to = toAvatar ?? _fallback;
@@ -91,8 +93,7 @@ class TransferCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '$fromName chuyển cho $toName: '
-              '${formatCurrency(settlement.amount, currency)}',
+              l10n.transferLine(fromName, toName, formatCurrency(settlement.amount, currency)),
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.onSurface,
@@ -102,7 +103,9 @@ class TransferCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  settled ? 'Đã thanh toán' : 'Chưa thanh toán',
+                  settled
+                      ? l10n.transferStatusSettled
+                      : l10n.transferStatusPending,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: settled
                         ? Colors.green.shade700
@@ -114,6 +117,7 @@ class TransferCard extends StatelessWidget {
                   onPressed: () => _copy(
                     context,
                     buildTransferText(
+                      l10n: l10n,
                       fromName: fromName,
                       toName: toName,
                       amount: settlement.amount,
@@ -124,7 +128,7 @@ class TransferCard extends StatelessWidget {
                     visualDensity: VisualDensity.compact,
                   ),
                   icon: const Icon(Icons.copy, size: 16),
-                  label: const Text('Copy'),
+                  label: Text(l10n.copyText),
                 ),
                 Checkbox(
                   value: settled,

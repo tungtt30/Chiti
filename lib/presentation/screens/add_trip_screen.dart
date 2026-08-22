@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
 import '../../core/formatters.dart';
 import '../../data/models/models.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/providers.dart';
 
 class AddTripScreen extends ConsumerStatefulWidget {
@@ -98,10 +99,15 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isEdit = _existing != null;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_existing == null ? 'Create Trip' : 'Edit Trip'),
-        actions: [TextButton(onPressed: _save, child: const Text('Save'))],
+        title: Text(isEdit ? l10n.editTrip : l10n.createTrip),
+        actions: [
+          TextButton(onPressed: _save, child: Text(l10n.save)),
+        ],
       ),
       body: Form(
         key: _formKey,
@@ -110,32 +116,32 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
           children: [
             TextFormField(
               controller: _nameCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Trip Name',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.flight),
+              decoration: InputDecoration(
+                labelText: l10n.tripName,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.flight),
               ),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _destCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Destination',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.place),
+              decoration: InputDecoration(
+                labelText: l10n.destination,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.place),
               ),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _currency,
-              decoration: const InputDecoration(
-                labelText: 'Currency',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.monetization_on),
+              decoration: InputDecoration(
+                labelText: l10n.currency,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.monetization_on),
               ),
               items: kSupportedCurrencies
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -147,14 +153,14 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
             const SizedBox(height: 16),
             _DateTile(
               icon: Icons.calendar_month,
-              label: 'Start Date',
+              label: l10n.startDate,
               value: formatDateCompact(_startDate),
               onTap: _pickStartDate,
             ),
             const SizedBox(height: 8),
             _DateTile(
               icon: Icons.calendar_month_outlined,
-              label: 'End Date',
+              label: l10n.endDate,
               value: formatDateCompact(_endDate),
               onTap: _pickEndDate,
             ),
@@ -162,7 +168,7 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.check),
-              label: Text(_existing == null ? 'Create Trip' : 'Save Changes'),
+              label: Text(isEdit ? l10n.saveChanges : l10n.createTrip),
             ),
           ],
         ),

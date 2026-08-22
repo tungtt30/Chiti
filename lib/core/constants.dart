@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+
 class ExpenseCategory {
   static const food = 'Food';
   static const transport = 'Transport';
@@ -15,16 +17,27 @@ class ExpenseCategory {
     others: '📦',
   };
 
-  /// Vietnamese labels for reporting (Bảng thống kê).
+  /// Fallback English labels (used by pure Dart code outside the widget tree).
   static const labels = {
-    food: 'Ăn uống',
-    transport: 'Di chuyển',
-    lodging: 'Lưu trú',
-    activities: 'Vui chơi',
-    others: 'Khác',
+    food: 'Food',
+    transport: 'Transport',
+    lodging: 'Lodging',
+    activities: 'Activities',
+    others: 'Other',
   };
 
-  static String label(String category) => labels[category] ?? 'Khác';
+  static String label(String category) => labels[category] ?? 'Other';
+
+  /// Locale-aware label for UI strings.
+  static String localizedLabel(String category, AppLocalizations l10n) {
+    return switch (category) {
+      food => l10n.categoryFood,
+      transport => l10n.categoryTransport,
+      lodging => l10n.categoryLodging,
+      activities => l10n.categoryActivities,
+      _ => l10n.categoryOther,
+    };
+  }
 
   static const fallback = others;
 }

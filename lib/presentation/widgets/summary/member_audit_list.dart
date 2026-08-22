@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/formatters.dart';
 import '../../../data/models/models.dart';
+import '../../../l10n/app_localizations.dart';
 import '../participant_chips.dart';
 
 /// Section B — Detailed participant audit rows.
@@ -20,6 +21,7 @@ class MemberAuditList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final avatars = {for (final p in participants) p.id: p};
 
     return Card(
@@ -31,11 +33,14 @@ class MemberAuditList extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
             child: Row(
               children: [
-                const Expanded(flex: 5, child: Text('Thành viên')),
+                Expanded(
+                  flex: 5,
+                  child: Text(l10n.auditMember),
+                ),
                 Expanded(
                   flex: 4,
                   child: Text(
-                    'Đã ứng trước',
+                    l10n.auditPaid,
                     textAlign: TextAlign.right,
                     style: _headerStyle(theme),
                   ),
@@ -43,7 +48,7 @@ class MemberAuditList extends StatelessWidget {
                 Expanded(
                   flex: 4,
                   child: Text(
-                    'Phải chịu',
+                    l10n.auditOwes,
                     textAlign: TextAlign.right,
                     style: _headerStyle(theme),
                   ),
@@ -82,7 +87,7 @@ class MemberAuditList extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    '${m.joinedCount}/${m.totalBillsCount} khoản · '
+                                    '${l10n.billsParticipation(m.joinedCount, m.totalBillsCount)} · '
                                     '${(m.participationRate * 100).round()}%',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: theme.colorScheme.onSurfaceVariant,
@@ -126,7 +131,7 @@ class MemberAuditList extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Số dư ròng = Đã ứng trước − Phải chịu',
+                l10n.auditNetRule,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -159,23 +164,24 @@ class _NetBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final String label;
     final Color background;
     final Color foreground;
     final IconData icon;
     if (net > 0.01) {
-      label = '+ Nhận lại ${formatCurrency(net, currency)}';
+      label = l10n.netReceiveBack(formatCurrency(net, currency));
       background = Colors.green.withValues(alpha: 0.14);
       foreground = Colors.green.shade800;
       icon = Icons.arrow_downward;
     } else if (net < -0.01) {
-      label = '- Đóng thêm ${formatCurrency(net.abs(), currency)}';
+      label = l10n.netPayMore(formatCurrency(net.abs(), currency));
       background = Colors.red.withValues(alpha: 0.12);
       foreground = Colors.red.shade700;
       icon = Icons.arrow_upward;
     } else {
-      label = 'Đã cân bằng';
+      label = l10n.netSettled;
       background = theme.colorScheme.surfaceContainerHigh;
       foreground = theme.disabledColor;
       icon = Icons.check;

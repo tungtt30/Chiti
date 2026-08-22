@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/formatters.dart';
 import '../../../data/models/models.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Section A — Trip financial overview KPI cards.
 class KpiCards extends StatelessWidget {
@@ -19,12 +20,13 @@ class KpiCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         _KpiCard(
           icon: Icons.account_balance_wallet,
           iconColor: theme.colorScheme.primary,
-          label: 'Tổng chi tiêu chuyến đi',
+          label: l10n.kpiTotalSpent,
           value: formatCurrency(stats.totalSpent, currency),
           emphasized: true,
         ),
@@ -35,7 +37,7 @@ class KpiCards extends StatelessWidget {
               child: _KpiCard(
                 icon: Icons.people_alt_outlined,
                 iconColor: theme.colorScheme.tertiary,
-                label: 'TB / người',
+                label: l10n.kpiAveragePerPerson,
                 value: formatCurrency(stats.averagePerMember, currency),
               ),
             ),
@@ -44,7 +46,7 @@ class KpiCards extends StatelessWidget {
               child: _KpiCard(
                 icon: Icons.receipt_long_outlined,
                 iconColor: theme.colorScheme.secondary,
-                label: 'Số khoản chi',
+                label: l10n.kpiExpenseCount,
                 value: '${stats.expenseCount}',
               ),
             ),
@@ -55,7 +57,7 @@ class KpiCards extends StatelessWidget {
           _KpiCard(
             icon: Icons.emoji_events_outlined,
             iconColor: Colors.orange.shade800,
-            label: 'Khoản chi lớn nhất',
+            label: l10n.kpiLargestExpense,
             value: stats.topExpense!.title,
             subtitle:
                 '${formatCurrency(stats.topExpense!.amount, currency)} · '

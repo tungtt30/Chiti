@@ -153,7 +153,7 @@ void main() {
     expect(lodging.percent, closeTo(0.5, 0.001));
     final food = stats.categories.firstWhere((c) => c.categoryId == 'Food');
     expect(food.total, 700);
-    expect(food.label, 'Ăn uống');
+    expect(food.label, 'Food');
   });
 
   test('unknown category folds into Other', () {

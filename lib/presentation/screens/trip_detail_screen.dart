@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/formatters.dart';
 import '../../data/models/models.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/providers.dart';
 import '../widgets/summary/summary_screen.dart';
 import 'add_edit_expense_screen.dart';
@@ -17,31 +18,42 @@ class TripDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tripAsync = ref.watch(tripDetailProvider(tripId));
+    final l10n = AppLocalizations.of(context)!;
 
     return tripAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+      error: (e, _) =>
+          Scaffold(body: Center(child: Text(l10n.errorLabel(e.toString())))),
       data: (trip) {
         if (trip == null) {
-          return const Scaffold(body: Center(child: Text('Trip not found')));
+          return Scaffold(body: Center(child: Text(l10n.tripNotFound)));
         }
         return DefaultTabController(
           length: 3,
           child: Scaffold(
             appBar: AppBar(
               title: Text(trip.name),
-              bottom: const TabBar(
+              bottom: TabBar(
                 tabs: [
-                  Tab(icon: Icon(Icons.receipt_long), text: 'Expenses'),
-                  Tab(icon: Icon(Icons.people), text: 'Members & Notes'),
-                  Tab(icon: Icon(Icons.balance), text: 'Summary'),
+                  Tab(
+                    icon: const Icon(Icons.receipt_long),
+                    text: l10n.tabExpenses,
+                  ),
+                  Tab(
+                    icon: const Icon(Icons.people),
+                    text: l10n.tabMembersAndNotes,
+                  ),
+                  Tab(
+                    icon: const Icon(Icons.balance),
+                    text: l10n.tabSummary,
+                  ),
                 ],
               ),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit Trip',
+                  tooltip: l10n.editTrip,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -88,10 +100,11 @@ class _ExpensesTab extends ConsumerWidget {
     final expensesAsync = ref.watch(expensesProvider(tripId));
     final participantsAsync = ref.watch(participantsProvider(tripId));
     final joinedAsync = ref.watch(expenseParticipantsForTripProvider(tripId));
+    final l10n = AppLocalizations.of(context)!;
 
     return expensesAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => Center(child: Text(l10n.errorLabel(e.toString()))),
       data: (expenses) {
         if (expenses.isEmpty) {
           return Center(
@@ -106,12 +119,12 @@ class _ExpensesTab extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No expenses yet',
+                  l10n.noExpensesYet,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tap + to add an expense',
+                  l10n.noExpensesHint,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -132,7 +145,7 @@ class _ExpensesTab extends ConsumerWidget {
           itemCount: expenses.length,
           itemBuilder: (context, index) {
             final e = expenses[index];
-            final payerLabel = nameMap[e.payerId] ?? 'Unknown';
+            final payerLabel = nameMap[e.payerId] ?? l10n.unknown;
             final joined = joinedCount[e.id] ?? 0;
 
             return Dismissible(
@@ -157,8 +170,13 @@ class _ExpensesTab extends ConsumerWidget {
                   ),
                 ),
                 title: Text(e.title),
-                subtitle: Text('Paid by $payerLabel · $joined of '
-                    '${participants.length} joined'),
+                subtitle: Text(
+                  l10n.expenseSubtitle(
+                    payerLabel,
+                    joined,
+                    participants.length,
+                  ),
+                ),
                 trailing: Text(
                   formatCurrency(e.amount, currency),
                   style: const TextStyle(fontWeight: FontWeight.bold),

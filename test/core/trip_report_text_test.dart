@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:chiti/core/trip_report_text.dart';
 import 'package:chiti/data/models/models.dart';
+import 'package:chiti/l10n/app_localizations_vi.dart';
 
 void main() {
   final stats = TripSummaryStats(
@@ -69,6 +70,7 @@ void main() {
   test('buildTripReportText contains header, members, categories, transfers',
       () {
     final text = buildTripReportText(
+      l10n: AppLocalizationsVi(),
       tripName: 'Phố Cổ',
       currency: 'VND',
       stats: stats,
@@ -89,6 +91,7 @@ void main() {
       paidSettlementsCount: 0,
     );
     final text = buildTripReportText(
+      l10n: AppLocalizationsVi(),
       tripName: 'Phố Cổ',
       currency: 'VND',
       stats: empty,
@@ -101,6 +104,7 @@ void main() {
 
   test('buildTransferText formats a single transfer line', () {
     final line = buildTransferText(
+      l10n: AppLocalizationsVi(),
       fromName: 'Bob',
       toName: 'Alice',
       amount: 120,

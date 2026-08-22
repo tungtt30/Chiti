@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/constants.dart';
 import '../../../core/formatters.dart';
 import '../../../data/models/models.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Section C — Category breakdown & spending distribution with progress bars.
 class CategoryBreakdown extends StatelessWidget {
@@ -17,9 +19,10 @@ class CategoryBreakdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     if (categories.isEmpty) {
       return Text(
-        'Chưa có dữ liệu danh mục.',
+        l10n.noCategoryData,
         style: theme.textTheme.bodySmall,
       );
     }
@@ -37,7 +40,7 @@ class CategoryBreakdown extends StatelessWidget {
                     Text('${c.emoji} ', style: theme.textTheme.titleSmall),
                     Expanded(
                       child: Text(
-                        c.label,
+                        ExpenseCategory.localizedLabel(c.categoryId, l10n),
                         style: theme.textTheme.titleSmall,
                       ),
                     ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/formatters.dart';
 import '../../data/models/models.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/providers.dart';
 import '../widgets/participant_chips.dart';
 import 'add_edit_expense_screen.dart';
@@ -20,10 +21,15 @@ class ExpenseDetailScreen extends ConsumerWidget {
     return detailsAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
+      error: (e, _) =>
+          Scaffold(body: Center(child: Text(AppLocalizations.of(context)!.errorLabel(e.toString())))),
       data: (details) {
         if (details == null) {
-          return const Scaffold(body: Center(child: Text('Expense not found')));
+          return Scaffold(
+            body: Center(
+              child: Text(AppLocalizations.of(context)!.expenseNotFound),
+            ),
+          );
         }
         final expense = details.expense;
         final participants =
@@ -42,14 +48,15 @@ class ExpenseDetailScreen extends ConsumerWidget {
               (p) => !details.participants.any((e) => e.participantId == p.id),
             )
             .toList();
+        final l10n = AppLocalizations.of(context)!;
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Expense Details'),
+            title: Text(l10n.expenseDetails),
             actions: [
               IconButton.filledTonal(
                 icon: const Icon(Icons.edit_outlined),
-                tooltip: 'Edit expense',
+                tooltip: l10n.editExpense,
                 onPressed: () async {
                   await Navigator.push(
                     context,
@@ -71,11 +78,11 @@ class ExpenseDetailScreen extends ConsumerWidget {
               _HeaderCard(
                 expense: expense,
                 currency: currency,
-                payerName: nameMap[expense.payerId] ?? 'Unknown',
+                payerName: nameMap[expense.payerId] ?? l10n.unknown,
               ),
               const SizedBox(height: 16),
               Text(
-                'Joined (${details.participants.length})',
+                l10n.joinedCount(details.participants.length),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -93,7 +100,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                           radius: 15,
                         ),
                         title: Text(
-                          nameMap[member.participantId] ?? 'Unknown',
+                          nameMap[member.participantId] ?? l10n.unknown,
                         ),
                         trailing: Text(
                           formatCurrency(member.shareAmount, currency),
@@ -105,13 +112,13 @@ class ExpenseDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Excluded (${excluded.length})',
+                l10n.excludedCount(excluded.length),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
               if (excluded.isEmpty)
                 Text(
-                  'Everyone joined this expense.',
+                  l10n.everyoneJoined,
                   style: Theme.of(context).textTheme.bodySmall,
                 )
               else
@@ -132,7 +139,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                             ),
                           ),
                           trailing: Text(
-                            'No share',
+                            l10n.noShare,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ),
@@ -153,7 +160,7 @@ class ExpenseDetailScreen extends ConsumerWidget {
                   );
                 },
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('Edit Expense'),
+                label: Text(l10n.editExpense),
               ),
               const SizedBox(height: 32),
             ],
@@ -191,6 +198,7 @@ class _HeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -216,7 +224,7 @@ class _HeaderCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Split equally · Paid by $payerName',
+              l10n.splitEquallyPaidBy(payerName),
               style: theme.textTheme.bodyMedium,
             ),
           ],

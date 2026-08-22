@@ -6,6 +6,7 @@ import '../../core/formatters.dart';
 import '../../core/id_generator.dart';
 import '../../core/settlement_calculator.dart';
 import '../../data/models/models.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/providers.dart';
 import '../widgets/participant_chips.dart';
 
@@ -102,20 +103,21 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     final total = _total() ?? 0;
     if (total <= 0) {
-      _showSnack('Amount must be greater than 0');
+      _showSnack(l10n.amountGreaterThanZero);
       return;
     }
     final users = _participants(ref);
     if (_selectedIds.isEmpty) {
-      _showSnack('Select at least one participant to split');
+      _showSnack(l10n.selectParticipantToSplit);
       return;
     }
     if (_payerId.isEmpty ||
         !users.any((p) => p.id == _payerId)) {
-      _showSnack('Select who paid');
+      _showSnack(l10n.selectWhoPaid);
       return;
     }
 
@@ -162,22 +164,24 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
   }
 
   Future<void> _confirmDelete() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete expense?'),
+        title: Text(l10n.deleteExpenseDialogTitle),
         content: Text(
-          'Delete "${_existing?.title ?? 'this expense'}"? '
-          'This cannot be undone.',
+          l10n.deleteExpenseDialogContent(
+            _existing?.title ?? l10n.expenseTitle,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -199,26 +203,27 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
   @override
   Widget build(BuildContext context) {
     final participantsAsync = ref.watch(participantsProvider(widget.tripId));
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEdit ? 'Edit Expense' : 'Add Expense'),
+        title: Text(_isEdit ? l10n.editExpense : l10n.addExpense),
         actions: [
           if (_isEdit)
             IconButton.filledTonal(
               icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete expense',
+              tooltip: l10n.deleteExpense,
               onPressed: _confirmDelete,
             ),
-          TextButton(onPressed: _save, child: const Text('Save')),
+          TextButton(onPressed: _save, child: Text(l10n.save)),
         ],
       ),
       body: participantsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(l10n.errorLabel(e.toString()))),
         data: (participants) {
           if (participants.isEmpty) {
-            return const Center(child: Text('Add participants first'));
+            return Center(child: Text(l10n.addParticipantsFirst));
           }
 
           if (_loadingExisting) {
@@ -253,14 +258,14 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                 children: [
                   TextFormField(
                     controller: _titleCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Title',
-                      hintText: 'Dinner at Beach, Grab to Hotel…',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.title),
+                    decoration: InputDecoration(
+                      labelText: l10n.expenseTitle,
+                      hintText: l10n.expenseTitleHint,
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.title),
                     ),
                     validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        (v == null || v.trim().isEmpty) ? l10n.required : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -269,15 +274,15 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    decoration: const InputDecoration(
-                      labelText: 'Amount',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.monetization_on),
+                    decoration: InputDecoration(
+                      labelText: l10n.amount,
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.monetization_on),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Required';
+                      if (v == null || v.isEmpty) return l10n.required;
                       final n = double.tryParse(v);
-                      if (n == null || n <= 0) return 'Must be > 0';
+                      if (n == null || n <= 0) return l10n.amountMustBePositive;
                       return null;
                     },
                   ),
@@ -294,7 +299,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
                   // ---- Category ----
                   Text(
-                    'Danh mục',
+                    l10n.category,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
@@ -304,7 +309,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                     children: ExpenseCategory.all.map((c) {
                       return ChoiceChip(
                         avatar: Text(ExpenseCategory.icons[c] ?? '📦'),
-                        label: Text(ExpenseCategory.label(c)),
+                        label: Text(ExpenseCategory.localizedLabel(c, l10n)),
                         selected: _category == c,
                         onSelected: (_) => setState(() => _category = c),
                       );
@@ -314,7 +319,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
                   // ---- Who paid ----
                   Text(
-                    'Who paid?',
+                    l10n.whoPaid,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
@@ -334,7 +339,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
                   // ---- Participants who joined ----
                   Text(
-                    'Who joined?',
+                    l10n.whoJoined,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 4),
@@ -344,10 +349,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            'Selected: ${_selectedIds.length} of '
-                            '${participants.length} members'
+                            '${l10n.selectedOfMembers(_selectedIds.length, participants.length)}'
                             '${previewTotal > 0 && _selectedIds.isNotEmpty
-                                ? ' (each ~ ${formatCurrency(previewTotal / _selectedIds.length, _currency())})'
+                                ? l10n.eachApprox(formatCurrency(previewTotal / _selectedIds.length, _currency()))
                                 : ''}',
                             style: const TextStyle(fontSize: 12),
                           ),
@@ -358,12 +362,12 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                               ..clear()
                               ..addAll(participants.map((p) => p.id));
                           }),
-                          child: const Text('Select All'),
+                          child: Text(l10n.selectAll),
                         ),
                         TextButton(
                           onPressed: () =>
                               setState(() => _selectedIds.clear()),
-                          child: const Text('Deselect All'),
+                          child: Text(l10n.deselectAll),
                         ),
                       ],
                     ),
@@ -381,7 +385,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                   FilledButton.icon(
                     onPressed: _save,
                     icon: const Icon(Icons.check),
-                    label: Text(_isEdit ? 'Save Changes' : 'Save Expense'),
+                    label: Text(_isEdit ? l10n.saveChanges : l10n.saveExpense),
                   ),
                   if (_isEdit) ...[
                     const SizedBox(height: 12),
@@ -391,7 +395,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                         foregroundColor: Theme.of(context).colorScheme.error,
                       ),
                       icon: const Icon(Icons.delete_outline),
-                      label: const Text('Delete Expense'),
+                      label: Text(l10n.deleteExpense),
                     ),
                   ],
                   const SizedBox(height: 32),
@@ -430,6 +434,7 @@ class _LiveSplitPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final nameMap = {for (final p in participants) p.id: p};
     final k = selectedIds.length;
 
@@ -443,25 +448,25 @@ class _LiveSplitPreview extends StatelessWidget {
               children: [
                 Icon(Icons.bolt, size: 18, color: theme.colorScheme.primary),
                 const SizedBox(width: 6),
-                Text('Live Split Preview', style: theme.textTheme.titleSmall),
+                Text(l10n.liveSplitPreview, style: theme.textTheme.titleSmall),
               ],
             ),
             const SizedBox(height: 8),
             if (k == 0)
               _banner(
                 theme,
-                'Chưa chọn người tham gia. Select who joined this expense.',
+                l10n.joinPreviewText,
                 isError: true,
               )
             else if (total <= 0)
               Text(
-                'Nhập số tiền để xem mức chia ngay.',
+                l10n.enterAmountPreview,
                 style: theme.textTheme.bodySmall,
               )
             else ...[
               Text(
-                'Mỗi người đóng: ${formatCurrency(total / k, currency)} '
-                '($k người tham gia)',
+                '${l10n.eachPaysPreview(formatCurrency(total / k, currency))} '
+                '${l10n.participantsCount(k)}',
                 style: theme.textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -496,9 +501,13 @@ class _LiveSplitPreview extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${nameMap[payerId]!.name} paid '
-                          '${formatCurrency(total, currency)}'
-                          '${selectedIds.contains(payerId) ? '' : ' (không tham gia)'}',
+                          l10n.payerSummary(
+                            nameMap[payerId]!.name,
+                            formatCurrency(total, currency),
+                            selectedIds.contains(payerId)
+                                ? ''
+                                : l10n.notJoinedSuffix,
+                          ),
                           style: theme.textTheme.bodySmall,
                         ),
                       ),

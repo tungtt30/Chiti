@@ -1,0 +1,408 @@
+{
+  "@@locale": "vi",
+
+  "appTitle": "Chiti",
+
+  "cancel": "Hủy",
+  "save": "Lưu",
+  "saveChanges": "Lưu thay đổi",
+  "delete": "Xóa",
+  "remove": "Xóa",
+  "required": "Bắt buộc",
+  "unknown": "Không rõ",
+  "errorLabel": "Lỗi: {error}",
+  "@errorLabel": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "settingsTitle": "Cài đặt",
+  "languageSectionTitle": "Ngôn ngữ",
+  "systemDefault": "Theo hệ thống",
+  "englishLanguage": "English",
+  "vietnameseLanguage": "Tiếng Việt",
+
+  "myTrips": "Chuyến đi của tôi",
+  "noTripsYet": "Chưa có chuyến đi nào",
+  "noTripsHint": "Nhấn + để tạo chuyến đi đầu tiên",
+  "newTrip": "Chuyến đi mới",
+  "deleteTripTitle": "Xóa chuyến đi?",
+  "deleteTripContent": "Xóa \"{tripName}\" và toàn bộ chi phí của chuyến đi?",
+  "@deleteTripContent": {
+    "placeholders": {
+      "tripName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "tabExpenses": "Khoản chi",
+  "tabMembersAndNotes": "Thành viên & Ghi chú",
+  "tabSummary": "Tổng kết",
+  "editTrip": "Sửa chuyến đi",
+  "tripNotFound": "Không tìm thấy chuyến đi",
+  "noExpensesYet": "Chưa có khoản chi nào",
+  "noExpensesHint": "Nhấn + để thêm khoản chi",
+  "expenseSubtitle": "{paidBy} đã trả · {joined}/{total} người tham gia",
+  "@expenseSubtitle": {
+    "placeholders": {
+      "paidBy": {
+        "type": "String"
+      },
+      "joined": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+
+  "createTrip": "Tạo chuyến đi",
+  "tripName": "Tên chuyến đi",
+  "destination": "Điểm đến",
+  "currency": "Tiền tệ",
+  "startDate": "Ngày bắt đầu",
+  "endDate": "Ngày kết thúc",
+
+  "addExpense": "Thêm khoản chi",
+  "editExpense": "Sửa khoản chi",
+  "saveExpense": "Lưu khoản chi",
+  "deleteExpense": "Xóa khoản chi",
+  "deleteExpenseDialogTitle": "Xóa khoản chi?",
+  "deleteExpenseDialogContent": "Xóa \"{title}\"? Hành động này không thể hoàn tác.",
+  "@deleteExpenseDialogContent": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "expenseTitle": "Tiêu đề",
+  "expenseTitleHint": "Ăn tối ở Biển, Grab về khách sạn…",
+  "amount": "Số tiền",
+  "amountMustBePositive": "Phải lớn hơn 0",
+  "category": "Danh mục",
+  "whoPaid": "Ai đã trả?",
+  "whoJoined": "Ai tham gia?",
+  "selectedOfMembers": "Đã chọn: {selected} trên {total} thành viên",
+  "@selectedOfMembers": {
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "eachApprox": " (mỗi người ~ {amount})",
+  "@eachApprox": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "selectAll": "Chọn tất cả",
+  "deselectAll": "Bỏ chọn tất cả",
+  "liveSplitPreview": "Xem trước mức chia",
+  "eachPaysPreview": "Mỗi người đóng: {amount}",
+  "@eachPaysPreview": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "participantsCount": "({count} người tham gia)",
+  "@participantsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "payerSummary": "{name} đã trả {amount}{suffix}",
+  "@payerSummary": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "suffix": {
+        "type": "String"
+      }
+    }
+  },
+  "notJoinedSuffix": " (không tham gia)",
+  "amountGreaterThanZero": "Số tiền phải lớn hơn 0",
+  "selectParticipantToSplit": "Chọn ít nhất một người tham gia để chia",
+  "selectWhoPaid": "Chọn người đã trả",
+  "addParticipantsFirst": "Hãy thêm thành viên trước",
+  "joinPreviewText": "Chưa chọn người tham gia. Hãy chọn những người tham gia khoản chi.",
+  "enterAmountPreview": "Nhập số tiền để xem mức chia ngay.",
+
+  "membersAndNotesTitle": "Thành viên & Ghi chú",
+  "addMember": "Thêm thành viên",
+  "editMember": "Sửa thành viên",
+  "noParticipantsYet": "Chưa có thành viên",
+  "noParticipantsHint": "Thêm nhóm để có thể chia chi phí",
+  "memberNotePlaceholder": "Chưa có ghi chú",
+  "editAction": "Sửa",
+  "removeAction": "Xóa",
+  "removeParticipantTitle": "Xóa thành viên?",
+  "removeParticipantContent": "Xóa {name} khỏi chuyến này?\nPhần chia và khoản chi của họ cũng sẽ bị xóa.",
+  "@removeParticipantContent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nameField": "Tên",
+  "contactOptional": "Liên hệ (không bắt buộc)",
+  "contactHint": "SĐT / email / handle",
+  "noteForTripOptional": "Ghi chú cho chuyến đi này (không bắt buộc)",
+  "noteHint": "VD: Đặt cọc sớm, giảm giá chay…",
+  "avatarColor": "Màu hình đại diện",
+
+  "expenseDetails": "Chi tiết khoản chi",
+  "expenseNotFound": "Không tìm thấy khoản chi",
+  "joinedCount": "Tham gia ({count})",
+  "@joinedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "excludedCount": "Không tham gia ({count})",
+  "@excludedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "everyoneJoined": "Mọi người đều tham gia khoản chi này.",
+  "noShare": "Không phải đóng",
+  "splitEquallyPaidBy": "Chia đều · {payer} đã trả",
+  "@splitEquallyPaidBy": {
+    "placeholders": {
+      "payer": {
+        "type": "String"
+      }
+    }
+  },
+
+  "memberAuditTitle": "Bảng đối soát thành viên",
+  "categoryAnalysisTitle": "Phân tích danh mục",
+  "settlementPlanTitle": "Kế hoạch thanh toán tối ưu",
+  "recalculate": "Tính / Cân đối lại",
+  "allSettledNoTransfer": "Đã cân bằng, không cần chuyển khoản 🎉",
+  "paidProgress": "Đã thanh toán: {count}/{total}",
+  "@paidProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "copyTripReport": "Sao chép báo cáo chuyến đi",
+  "reportCopied": "Đã sao chép báo cáo chuyến đi",
+  "statsEmptyTitle": "Chưa có khoản chi nào",
+  "statsEmptyHint": "Thêm chi tiêu để xem bảng thống kê và kế hoạch thanh toán.",
+  "kpiTotalSpent": "Tổng chi tiêu chuyến đi",
+  "kpiAveragePerPerson": "TB / người",
+  "kpiExpenseCount": "Số khoản chi",
+  "kpiLargestExpense": "Khoản chi lớn nhất",
+  "auditMember": "Thành viên",
+  "auditPaid": "Đã ứng trước",
+  "auditOwes": "Phải chịu",
+  "auditNetRule": "Số dư ròng = Đã ứng trước − Phải chịu",
+  "netReceiveBack": "+ Nhận lại {amount}",
+  "@netReceiveBack": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "netPayMore": "- Đóng thêm {amount}",
+  "@netPayMore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "netSettled": "Đã cân bằng",
+  "noCategoryData": "Chưa có dữ liệu danh mục.",
+  "billsParticipation": "{joined}/{total} khoản",
+  "@billsParticipation": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "transferLine": "{from} chuyển cho {to}: {amount}",
+  "@transferLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "transferStatusSettled": "Đã thanh toán",
+  "transferStatusPending": "Chưa thanh toán",
+  "copyText": "Sao chép",
+  "copiedToClipboard": "Đã sao chép vào clipboard",
+
+  "reportTitle": "BÁO CÁO CHUYẾN ĐI \"{tripName}\"",
+  "@reportTitle": {
+    "placeholders": {
+      "tripName": {
+        "type": "String"
+      }
+    }
+  },
+  "reportTotalAverage": "Tổng chi tiêu: {amount} · Trung bình: {average}/người",
+  "@reportTotalAverage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "average": {
+        "type": "String"
+      }
+    }
+  },
+  "reportMembersHeader": "Thành viên:",
+  "reportMemberLine": "• {name} — đã ứng: {paid} · đã tiêu: {spent} · tham gia {joined}/{total} khoản · {net}",
+  "@reportMemberLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "paid": {
+        "type": "String"
+      },
+      "spent": {
+        "type": "String"
+      },
+      "joined": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "net": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetReceiveBack": "nhận lại: +{amount}",
+  "@reportNetReceiveBack": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetPayMore": "đóng thêm: {amount}",
+  "@reportNetPayMore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetSettled": "đã cân bằng",
+  "reportCategoriesHeader": "Danh mục chi tiêu:",
+  "reportCategoryLine": "• {emoji} {label}: {amount} ({percent}%)",
+  "@reportCategoryLine": {
+    "placeholders": {
+      "emoji": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSettlementsHeader": "Thanh toán:",
+  "reportAllSettled": "• Đã cân bằng, không cần chuyển khoản 🎉",
+  "reportSettlementLine": "• {from} chuyển cho {to}: {amount}{paid}",
+  "@reportSettlementLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "paid": {
+        "type": "String"
+      }
+    }
+  },
+  "reportPaidProgress": "✅ Đã thanh toán: {count}/{total}",
+  "@reportPaidProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "transferReportLine": "{from} chuyển cho {to}: {amount}",
+  "@transferReportLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "categoryFood": "Ăn uống",
+  "categoryTransport": "Di chuyển",
+  "categoryLodging": "Lưu trú",
+  "categoryActivities": "Vui chơi",
+  "categoryOther": "Khác"
+}

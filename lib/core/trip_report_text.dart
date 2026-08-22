@@ -1,20 +1,12 @@
-import '../core/formatters.dart';
 import '../data/models/models.dart';
+import '../l10n/app_localizations.dart';
+import 'constants.dart';
+import 'formatters.dart';
 
 /// Builds the plain-text trip report for group-chat sharing (Zalo / Telegram /
 /// Messenger).
-///
-/// Example:
-/// ─────────────────────────────
-/// 🧾 BÁO CÁO CHUYẾN ĐI "Phố Cổ"
-/// 💰 Tổng chi tiêu: 1.500.000 ₫ · Trung bình: 375.000 ₫/người
-/// 👥 Thành viên:
-/// • Vũ Ngọc Linh — đã ứng: 500.000 ₫ · đã tiêu: 400.000 ₫ · nhận lại: +100.000 ₫
-/// ➡ Thanh toán:
-/// • Nguyễn Văn A chuyển cho Trần Thị B: 250.000 ₫
-/// ✅ Đã thanh toán: 0/1
-/// ─────────────────────────────
 String buildTripReportText({
+  required AppLocalizations l10n,
   required String tripName,
   required String currency,
   required TripSummaryStats stats,
@@ -22,53 +14,70 @@ String buildTripReportText({
 }) {
   final buf = StringBuffer();
 
-  buf.writeln('🧾 BÁO CÁO CHUYẾN ĐI "$tripName"');
+  buf.writeln('🧾 ${l10n.reportTitle(tripName)}');
   buf.writeln(
-    '💰 Tổng chi tiêu: ${formatCurrency(stats.totalSpent, currency)} '
-    '· Trung bình: ${formatCurrency(stats.averagePerMember, currency)}/người',
+    '💰 ${l10n.reportTotalAverage(formatCurrency(stats.totalSpent, currency), formatCurrency(stats.averagePerMember, currency))}',
   );
 
   if (stats.expenseCount > 0) {
-    buf.write('\n👥 Thành viên:\n');
+    buf.write('\n👥 ${l10n.reportMembersHeader}\n');
     for (final m in stats.members) {
       final netText = switch (m.net) {
-        > 0.01 => 'nhận lại: +${formatCurrency(m.net, currency)}',
-        < -0.01 => 'đóng thêm: ${formatCurrency(m.net.abs(), currency)}',
-        _ => 'đã cân bằng',
+        > 0.01 => l10n.reportNetReceiveBack(
+          formatCurrency(m.net, currency),
+        ),
+        < -0.01 => l10n.reportNetPayMore(
+          formatCurrency(m.net.abs(), currency),
+        ),
+        _ => l10n.reportNetSettled,
       };
       buf.writeln(
-        '• ${m.name} — đã ứng: ${formatCurrency(m.paid, currency)}'
-        ' · đã tiêu: ${formatCurrency(m.consumed, currency)}'
-        ' · tham gia ${m.joinedCount}/${m.totalBillsCount} khoản'
-        ' · $netText',
+        l10n.reportMemberLine(
+          m.name,
+          formatCurrency(m.paid, currency),
+          formatCurrency(m.consumed, currency),
+          m.joinedCount,
+          m.totalBillsCount,
+          netText,
+        ),
       );
     }
 
-    buf.write('\n📊 Danh mục chi tiêu:\n');
+    buf.writeln('\n📊 ${l10n.reportCategoriesHeader}');
     for (final c in stats.categories) {
       final pct = (c.percent * 100).round();
       buf.writeln(
-        '• ${c.emoji} ${c.label}: ${formatCurrency(c.total, currency)} '
-        '($pct%)',
+        l10n.reportCategoryLine(
+          c.emoji,
+          ExpenseCategory.localizedLabel(c.categoryId, l10n),
+          formatCurrency(c.total, currency),
+          pct,
+        ),
       );
     }
   }
 
-  buf.write('\n➡ Thanh toán:\n');
+  buf.writeln('\n➡ ${l10n.reportSettlementsHeader}');
   if (stats.settlements.isEmpty) {
-    buf.writeln('• Đã cân bằng, không cần chuyển khoản 🎉');
+    buf.writeln(l10n.reportAllSettled);
   } else {
     for (final s in stats.settlements) {
       final from = nameMap[s.fromParticipantId] ?? '?';
       final to = nameMap[s.toParticipantId] ?? '?';
       buf.writeln(
-        '• $from chuyển cho $to: ${formatCurrency(s.amount, currency)}'
-        '${s.isPaid ? ' ✅' : ''}',
+        l10n.reportSettlementLine(
+          from,
+          to,
+          formatCurrency(s.amount, currency),
+          s.isPaid ? ' ✅' : '',
+        ),
       );
     }
     buf.writeln(
-      '✅ Đã thanh toán: ${stats.paidSettlementsCount}/'
-      '${stats.settlements.length}',
+      l10n.reportPaidProgress(
+        stats.paidSettlementsCount,
+        stats.settlements.length,
+      ),
     );
   }
 
@@ -77,10 +86,11 @@ String buildTripReportText({
 
 /// Single settlement transfer line for the per-card "Copy" action.
 String buildTransferText({
+  required AppLocalizations l10n,
   required String fromName,
   required String toName,
   required double amount,
   required String currency,
 }) {
-  return '$fromName chuyển cho $toName: ${formatCurrency(amount, currency)}';
+  return l10n.transferReportLine(fromName, toName, formatCurrency(amount, currency));
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/trip_report_text.dart';
 import '../../../data/models/models.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../providers/providers.dart';
 import '../../../providers/trip_summary_provider.dart';
 import 'category_breakdown.dart';
@@ -20,6 +21,7 @@ class SummaryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final statsAsync = ref.watch(tripSummaryProvider(tripId));
     final tripName =
         ref.watch(tripDetailProvider(tripId)).valueOrNull?.name ?? '';
@@ -30,10 +32,11 @@ class SummaryScreen extends ConsumerWidget {
 
     return statsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Lỗi: $e')),
+      error: (e, _) =>
+          Center(child: Text(l10n.errorLabel(e.toString()))),
       data: (stats) {
         if (stats.expenseCount == 0) {
-          return const _EmptyState();
+          return _EmptyState(l10n: l10n);
         }
         return ListView(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 88),
@@ -47,7 +50,7 @@ class SummaryScreen extends ConsumerWidget {
 
             _SectionHeader(
               icon: Icons.fact_check_outlined,
-              title: 'Bảng đối soát thành viên',
+              title: l10n.memberAuditTitle,
             ),
             MemberAuditList(
               members: stats.members,
@@ -57,7 +60,7 @@ class SummaryScreen extends ConsumerWidget {
 
             _SectionHeader(
               icon: Icons.pie_chart_outline,
-              title: 'Phân tích danh mục',
+              title: l10n.categoryAnalysisTitle,
             ),
             Card.filled(
               margin: EdgeInsets.zero,
@@ -72,7 +75,7 @@ class SummaryScreen extends ConsumerWidget {
 
             _SectionHeader(
               icon: Icons.swap_horiz_rounded,
-              title: 'Kế hoạch thanh toán tối ưu',
+              title: l10n.settlementPlanTitle,
             ),
             if (stats.settlements.isEmpty)
               Card.outlined(
@@ -85,7 +88,7 @@ class SummaryScreen extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Đã cân bằng, không cần chuyển khoản 🎉',
+                          l10n.allSettledNoTransfer,
                           style: theme.textTheme.bodyMedium,
                         ),
                       ),
@@ -99,7 +102,7 @@ class SummaryScreen extends ConsumerWidget {
                     .read(settlementsProvider(tripId).notifier)
                     .recalculate(),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Tính / Cân đối lại'),
+                label: Text(l10n.recalculate),
               ),
               const SizedBox(height: 8),
               LinearProgressIndicator(
@@ -109,8 +112,10 @@ class SummaryScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Text(
-                  'Đã thanh toán: ${stats.paidSettlementsCount}/'
-                  '${stats.settlements.length}',
+                  l10n.paidProgress(
+                    stats.paidSettlementsCount,
+                    stats.settlements.length,
+                  ),
                   style: theme.textTheme.bodySmall,
                 ),
               ),
@@ -134,6 +139,7 @@ class SummaryScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
             _ExportButton(
+              l10n: l10n,
               tripName: tripName,
               stats: stats,
               currency: currency,
@@ -173,12 +179,14 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _ExportButton extends StatelessWidget {
+  final AppLocalizations l10n;
   final String tripName;
   final TripSummaryStats stats;
   final String currency;
   final Map<String, String> nameMap;
 
   const _ExportButton({
+    required this.l10n,
     required this.tripName,
     required this.stats,
     required this.currency,
@@ -188,8 +196,9 @@ class _ExportButton extends StatelessWidget {
   Future<void> _copyFullReport(BuildContext context, String text) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (!context.mounted) return;
+    final l = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã sao chép báo cáo chuyến đi')),
+      SnackBar(content: Text(l.reportCopied)),
     );
   }
 
@@ -199,6 +208,7 @@ class _ExportButton extends StatelessWidget {
       onPressed: () => _copyFullReport(
         context,
         buildTripReportText(
+          l10n: l10n,
           tripName: tripName,
           currency: currency,
           stats: stats,
@@ -206,13 +216,14 @@ class _ExportButton extends StatelessWidget {
         ),
       ),
       icon: const Icon(Icons.ios_share),
-      label: const Text('Sao chép báo cáo chuyến đi'),
+      label: Text(l10n.copyTripReport),
     );
   }
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  final AppLocalizations l10n;
+  const _EmptyState({required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -228,12 +239,12 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Chưa có khoản chi nào',
+            l10n.statsEmptyTitle,
             style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(
-            'Thêm chi tiêu để xem bảng thống kê và kế hoạch thanh toán.',
+            l10n.statsEmptyHint,
             style: theme.textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
