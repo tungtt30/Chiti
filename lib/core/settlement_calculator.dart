@@ -5,6 +5,8 @@
 /// largest creditor.
 library;
 
+import 'constants.dart' show SplitMode;
+
 class Transfer {
   final String from;
   final String to;
@@ -195,4 +197,66 @@ List<double> splitByWeight({
     shares.add(share);
   }
   return shares;
+}
+
+/// ----------------------------------
+/// Subset (sub-group) split helpers
+/// ----------------------------------
+
+/// On-the-spot per-person share for a single expense over the selected
+/// *subset* of participants. Participants not in [selectedIds] get no entry in
+/// the result (they owe nothing for this expense).
+///
+/// - equal:         each selected person owes `total / k`; the last share in
+///                  list order absorbs the cent-rounding remainder (mirroring
+///                  [splitEqually] so the preview matches what is persisted).
+/// - custom_amount: [customAmounts] is used verbatim per selected id.
+/// - custom_weight: proportional to [weights] via [splitByWeight].
+Map<String, double> computeSubsetShares({
+  required double total,
+  required List<String> selectedIds,
+  required String splitMode,
+  Map<String, double> customAmounts = const {},
+  Map<String, double> weights = const {},
+}) {
+  if (selectedIds.isEmpty || total <= 0) return const {};
+  switch (splitMode) {
+    case SplitMode.customAmount:
+      return {
+        for (final id in selectedIds) id: customAmounts[id] ?? 0.0,
+      };
+    case SplitMode.customWeight:
+      final shareList = splitByWeight(
+        total: total,
+        weights: selectedIds.map((id) => weights[id] ?? 0).toList(),
+      );
+      return {
+        for (var i = 0; i < selectedIds.length; i++)
+          selectedIds[i]: shareList[i],
+      };
+    default: // SplitMode.equal
+      final shareList = splitEqually(total: total, count: selectedIds.length);
+      return {
+        for (var i = 0; i < selectedIds.length; i++)
+          selectedIds[i]: shareList[i],
+      };
+  }
+}
+
+/// One payer's net impact for a single expense.
+///
+/// Positive = this payer is owed money back (credited), negative = they still
+/// owe more.
+///
+/// Two spec branches:
+/// - Payer is part of the selected participants: they are credited
+///   [amountPaid] - [shareObligation].
+/// - Payer is NOT part of the selected participants (paid on behalf of the
+///   sub-group): [shareObligation] is 0 and they are credited the full
+///   [amountPaid].
+double computePayerNetImpact({
+  required double amountPaid,
+  required double shareObligation,
+}) {
+  return _round2(amountPaid - shareObligation);
 }

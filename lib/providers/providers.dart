@@ -228,6 +228,12 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
 
 // ---- Derived scores for a trip ----
 
+/// Single expense bundled with its payers and split rows (detail view).
+final expenseDetailsProvider = FutureProvider.autoDispose
+    .family<ExpenseWithSplits?, String>((ref, expenseId) {
+      return ref.read(repositoryProvider).getExpenseDetails(expenseId);
+    });
+
 /// Amount each participant paid across all expenses (one row per payer).
 final payersForTripProvider = FutureProvider.autoDispose
     .family<List<ExpensePayer>, String>((ref, tripId) async {

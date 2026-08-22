@@ -9,6 +9,7 @@ import '../widgets/summary_table.dart';
 import '../widgets/settlement_card.dart';
 import 'add_edit_expense_screen.dart';
 import 'add_trip_screen.dart';
+import 'expense_detail_screen.dart';
 import 'manage_participants_screen.dart';
 
 class TripDetailScreen extends ConsumerWidget {
@@ -172,7 +173,7 @@ class _ExpensesTab extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) =>
-                          AddEditExpenseScreen(tripId: tripId, existing: e),
+                          ExpenseDetailScreen(expenseId: e.id),
                     ),
                   );
                 },

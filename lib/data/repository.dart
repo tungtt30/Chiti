@@ -221,6 +221,24 @@ class AppRepository {
     await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
   }
 
+  /// Returns an expense together with its payers and splits, or null when the
+  /// expense no longer exists.
+  Future<ExpenseWithSplits?> getExpenseDetails(String expenseId) async {
+    final db = await _helper.database;
+    final maps = await db.query(
+      'expenses',
+      where: 'id = ?',
+      whereArgs: [expenseId],
+    );
+    if (maps.isEmpty) return null;
+    final expense = Expense.fromMap(maps.first);
+    return ExpenseWithSplits(
+      expense: expense,
+      payers: await getExpensePayers(expenseId),
+      splits: await getExpenseSplits(expenseId),
+    );
+  }
+
   // ---- Expense payers ----
 
   Future<List<ExpensePayer>> getExpensePayers(String expenseId) async {

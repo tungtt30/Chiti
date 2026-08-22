@@ -81,6 +81,17 @@ class FakeAppRepository extends AppRepository {
       List.of(splitsByExpense[expenseId] ?? const []);
 
   @override
+  Future<ExpenseWithSplits?> getExpenseDetails(String expenseId) async {
+    final match = expenses.where((e) => e.id == expenseId).toList();
+    if (match.isEmpty) return null;
+    return ExpenseWithSplits(
+      expense: match.first,
+      payers: List.of(payersByExpense[expenseId] ?? const []),
+      splits: List.of(splitsByExpense[expenseId] ?? const []),
+    );
+  }
+
+  @override
   Future<List<ExpensePayer>> getPayersForTrip(String tripId) async {
     final ids = expenses.where((e) => e.tripId == tripId).map((e) => e.id);
     return [
@@ -271,5 +282,23 @@ void main() {
     // payer paid 0, owes 50 -> net -50; other paid 100, share 50 -> net +50.
     expect(payer.net, closeTo(-50, 0.01));
     expect(other.net, closeTo(50, 0.01));
+  });
+
+  test('expenseDetailsProvider returns bundled expense, payers and splits',
+      () async {
+    setUpExpense();
+
+    final details =
+        await container.read(expenseDetailsProvider('exp-9').future);
+
+    expect(details, isNotNull);
+    expect(details!.expense.title, 'Dinner');
+    expect(details.payers, hasLength(1));
+    expect(details.splits, hasLength(2));
+
+    // Unknown id resolves to null.
+    final missing =
+        await container.read(expenseDetailsProvider('missing').future);
+    expect(missing, isNull);
   });
 }
