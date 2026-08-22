@@ -317,6 +317,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyTripReport => 'Copy trip report';
 
   @override
+  String get shareSummary => 'Share Summary';
+
+  @override
   String get reportCopied => 'Trip report copied';
 
   @override

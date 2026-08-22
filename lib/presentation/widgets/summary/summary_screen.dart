@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/trip_report_text.dart';
-import '../../../data/models/models.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/providers.dart';
 import '../../../providers/trip_summary_provider.dart';
@@ -23,8 +20,6 @@ class SummaryScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final statsAsync = ref.watch(tripSummaryProvider(tripId));
-    final tripName =
-        ref.watch(tripDetailProvider(tripId)).valueOrNull?.name ?? '';
     final participants =
         ref.watch(participantsProvider(tripId)).valueOrNull ?? [];
     final nameMap = {for (final p in participants) p.id: p.name};
@@ -136,15 +131,6 @@ class SummaryScreen extends ConsumerWidget {
                 ),
               ),
             ],
-
-            const SizedBox(height: 16),
-            _ExportButton(
-              l10n: l10n,
-              tripName: tripName,
-              stats: stats,
-              currency: currency,
-              nameMap: nameMap,
-            ),
           ],
         );
       },
@@ -174,49 +160,6 @@ class _SectionHeader extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ExportButton extends StatelessWidget {
-  final AppLocalizations l10n;
-  final String tripName;
-  final TripSummaryStats stats;
-  final String currency;
-  final Map<String, String> nameMap;
-
-  const _ExportButton({
-    required this.l10n,
-    required this.tripName,
-    required this.stats,
-    required this.currency,
-    required this.nameMap,
-  });
-
-  Future<void> _copyFullReport(BuildContext context, String text) async {
-    await Clipboard.setData(ClipboardData(text: text));
-    if (!context.mounted) return;
-    final l = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l.reportCopied)),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton.icon(
-      onPressed: () => _copyFullReport(
-        context,
-        buildTripReportText(
-          l10n: l10n,
-          tripName: tripName,
-          currency: currency,
-          stats: stats,
-          nameMap: nameMap,
-        ),
-      ),
-      icon: const Icon(Icons.ios_share),
-      label: Text(l10n.copyTripReport),
     );
   }
 }

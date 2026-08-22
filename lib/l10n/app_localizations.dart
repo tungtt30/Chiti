@@ -650,6 +650,12 @@ abstract class AppLocalizations {
   /// **'Copy trip report'**
   String get copyTripReport;
 
+  /// No description provided for @shareSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Summary'**
+  String get shareSummary;
+
   /// No description provided for @reportCopied.
   ///
   /// In en, this message translates to:

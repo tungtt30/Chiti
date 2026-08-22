@@ -222,6 +222,7 @@
     }
   },
   "copyTripReport": "Copy trip report",
+  "shareSummary": "Share Summary",
   "reportCopied": "Trip report copied",
   "statsEmptyTitle": "No expenses yet",
   "statsEmptyHint": "Add expenses to see statistics and the payment plan.",

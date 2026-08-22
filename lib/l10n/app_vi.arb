@@ -218,6 +218,7 @@
     }
   },
   "copyTripReport": "Sao chép báo cáo chuyến đi",
+  "shareSummary": "Chia sẻ tổng kết",
   "reportCopied": "Đã sao chép báo cáo chuyến đi",
   "statsEmptyTitle": "Chưa có khoản chi nào",
   "statsEmptyHint": "Thêm chi tiêu để xem bảng thống kê và kế hoạch thanh toán.",

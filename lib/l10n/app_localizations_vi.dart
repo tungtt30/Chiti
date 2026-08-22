@@ -317,6 +317,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get copyTripReport => 'Sao chép báo cáo chuyến đi';
 
   @override
+  String get shareSummary => 'Chia sẻ tổng kết';
+
+  @override
   String get reportCopied => 'Đã sao chép báo cáo chuyến đi';
 
   @override
