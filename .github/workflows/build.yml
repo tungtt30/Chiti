@@ -114,9 +114,10 @@ jobs:
       #    debug-signed (unsigned-for-store) APK, which is what the default
       #    Flutter template generates anyway.
       - name: Import Android signing keys (optional)
-        # Note: `secrets.*` is compared directly in the `if` expression; secrets
-        # are never copied into `env` for other steps that could print them.
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        # Note: the `secrets` context is not allowed in `if:` expressions, so we
+        # read the secret into an `env` var below and test it here. When the
+        # secret is unset this evaluates to an empty string and the step skips.
+        if: ${{ env.KEYSTORE_BASE64 != '' }}
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
