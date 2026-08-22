@@ -1,0 +1,263 @@
+# =============================================================================
+# CI/CD Build Pipeline — chiti (Flutter)
+#
+# Builds Android (APK + AppBundle) and iOS (unsigned archive) on every push /
+# pull request to main, master or develop. Can also be triggered manually from
+# the GitHub Actions UI ("Run workflow" button).
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   - For signed Android release builds (OPTIONAL):
+#       KEYSTORE_BASE64   Base64-encoded upload-keystore.jks
+#       KEYSTORE_PASSWORD The keystore password
+#       KEY_ALIAS         The key alias
+#       KEY_PASSWORD      The key password
+#   - For provisioning/wiring a signed iOS release (OPTIONAL):
+#       APPLE_ISSUER_ID / APPLE_KEY_ID / APPLE_API_KEY  (App Store Connect API)
+#       or P12_BASE64 / P12_PASSWORD / PROVISIONING_PROFILE_BASE64
+# =============================================================================
+
+name: flutter-ci-build
+
+# -----------------------------------------------------------------------------
+# Triggers
+# -----------------------------------------------------------------------------
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  # Enables the "Run workflow" button in the GitHub Actions tab.
+  workflow_dispatch:
+
+# Cancel a running pipeline when a newer commit is pushed to the same branch.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Pin Java toolchain used by both jobs (the app targets JVM 17).
+  JAVA_VERSION: '17'
+
+jobs:
+  # ===========================================================================
+  # JOB 1 — Android: analyze, test, build APK + AppBundle, upload artifacts
+  # ===========================================================================
+  build-android:
+    name: Build Android (APK + AppBundle)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Fetch the repository source code.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install JDK 17 (Temurin). Flutter's Android Gradle Plugin requires a
+      #    recent JDK; 17 matches the project's compileOptions.
+      - name: Setup Java (Temurin JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      # 3. Install Flutter (stable channel) and cache the Flutter SDK + pub
+      #    cache so the SDK download and pub dependencies are not re-fetched.
+      - name: Setup Flutter (stable, cached)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Optionally pin an exact version for bit-reproducible builds, e.g.
+          #   flutter-version: '3.24.0'
+          cache: true
+
+      # 4. Fetch Dart/Flutter package dependencies from pub.dev.
+      - name: Get dependencies
+        run: flutter pub get
+
+      # 5. Static analysis — fail-fast if any lint rules are violated.
+      - name: Run flutter analyze
+        run: flutter analyze
+
+      # 6. Run the unit/widget test suite — fail-fast on regressions.
+      - name: Run flutter test
+        run: flutter test
+
+      # 7. (OPTIONAL) Production Android signing.
+      #    If KEYSTORE_BASE64 is set in the repo secrets, decode it into the
+      #    keystore file and write android/key.properties. The app's
+      #    android/app/build.gradle.kts reads those values to sign the release.
+      #    Wire-up (add into android/app/build.gradle.kts, inside `android {}`):
+      #
+      #      import java.util.Properties
+      #      val keystoreProperties = Properties().apply {
+      #          val f = rootProject.file("key.properties")
+      #          if (f.exists()) f.inputStream().use { load(it) }
+      #      }
+      #      ...
+      #      signingConfigs {
+      #          create("release") {
+      #              if (keystoreProperties.containsKey("storeFile")) {
+      #                  keyAlias = keystoreProperties["keyAlias"] as String
+      #                  keyPassword = keystoreProperties["keyPassword"] as String
+      #                  storeFile = file(keystoreProperties["storeFile"] as String)
+      #                  storePassword = keystoreProperties["storePassword"] as String
+      #              }
+      #          }
+      #      }
+      #      buildTypes {
+      #          release {
+      #              signingConfig = if (keystoreProperties.containsKey("storeFile"))
+      #                  signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+      #          }
+      #      }
+      #
+      #    Without these secrets the workflow still succeeds and emits a
+      #    debug-signed (unsigned-for-store) APK, which is what the default
+      #    Flutter template generates anyway.
+      - name: Import Android signing keys (optional)
+        # Note: `secrets.*` is compared directly in the `if` expression; secrets
+        # are never copied into `env` for other steps that could print them.
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          {
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storeFile=upload-keystore.jks"
+          } > android/key.properties
+
+      # 8. Cache Gradle dependencies + wrapper across runs to cut build time.
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      # 9. Build the release APK. Output:
+      #      build/app/outputs/flutter-apk/app-release.apk
+      - name: Build release APK
+        run: flutter build apk --release
+
+      # 10. Build the Android App Bundle for Play Console upload. Output:
+      #       build/app/outputs/bundle/release/app-release.aab
+      - name: Build release AppBundle (AAB)
+        run: flutter build appbundle --release
+
+      # 11. Stage artifacts under well-known names and upload them. They become
+      #     downloadable from the run summary tab (see README_CI.md).
+      - name: Stage Android artifacts
+        run: |
+          mkdir -p staging
+          cp build/app/outputs/flutter-apk/app-release.apk staging/app-release.apk
+          cp build/app/outputs/bundle/release/app-release.aab staging/app-release.aab
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chiti-android-release
+          path: staging/
+          if-no-files-found: error
+
+  # ===========================================================================
+  # JOB 2 — iOS: analyze, test, build unsigned archive, zip, upload
+  # ===========================================================================
+  build-ios:
+    name: Build iOS (unsigned archive)
+    # macOS runners ship with Xcode and Ruby (CocoaPods) pre-installed.
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter (stable, cached)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Cache CocoaPods specs + installed Pods to avoid re-downloading on every run.
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods
+            ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
+      # Install iOS native dependencies generated by Flutter plugins.
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios
+          pod install
+
+      # Run the same quality gates on iOS as on Android.
+      - name: Run flutter analyze
+        run: flutter analyze
+
+      - name: Run flutter test
+        run: flutter test
+
+      # Build the iOS app WITHOUT code signing. `--no-codesign` skips the
+      # signing step, so no certificates are needed for this pipeline. The
+      # resulting Runner.app is produced under build/ios/iphoneos/.
+      - name: Build iOS archive (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      # Deploy signing note (OPTIONAL):
+      # ------------------------------
+      # To produce a signed IPA or ship to TestFlight/App Store you should use
+      # Fastlane + an App Store Connect API Key stored in secrets, e.g.:
+      #
+      #   - name: Install Fastlane
+      #     run: sudo gem install fastlane -NV
+      #   - name: Configure App Store Connect API key
+      #     env:
+      #       APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+      #       APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+      #       APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+      #     run: |
+      #       mkdir -p ~/private_keys
+      #       echo "$APPLE_API_KEY" | base64 --decode > ~/private_keys/AuthKey_$APPLE_KEY_ID.p8
+      #   - name: Run Fastlane beta
+      #     env:
+      #       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      #     run: fastlane beta
+      #
+      # A p12 + provisioning-profile alternative:
+      #   - Import p12 into the keychain:
+      #       echo "$P12_BASE64" | base64 --decode > cert.p12
+      #       security create-keychain -p "$RUNNER_USER" build.keychain
+      #       security import cert.p12 -k build.keychain -P "$P12_PASSWORD" -A
+      #       security set-key-partition-list -S apple-tool:,apple: -k "$RUNNER_USER" build.keychain
+      #       security unlock-keychain -p "$RUNNER_USER" build.keychain
+      #   - Install the provisioning profile under ~/Library/MobileDevice/Provisioning Profiles/.
+      #   - Then build with codesigning enabled:  flutter build ipa --release
+
+      # Zip Runner.app into the standard Payload/ layout so the artifact is a
+      # valid (unsigned) .ipa that can be reinstalled on a device for QA.
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -r chiti-runner-unsigned.ipa Payload
+          rm -rf Payload
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chiti-ios-unsigned
+          path: chiti-runner-unsigned.ipa
+          if-no-files-found: error
