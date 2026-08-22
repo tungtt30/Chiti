@@ -14,6 +14,19 @@ class ExpenseCategory {
     activities: '🎭',
     others: '📦',
   };
+
+  /// Vietnamese labels for reporting (Bảng thống kê).
+  static const labels = {
+    food: 'Ăn uống',
+    transport: 'Di chuyển',
+    lodging: 'Lưu trú',
+    activities: 'Vui chơi',
+    others: 'Khác',
+  };
+
+  static String label(String category) => labels[category] ?? 'Khác';
+
+  static const fallback = others;
 }
 
 /// How the total of an expense is divided among participants.

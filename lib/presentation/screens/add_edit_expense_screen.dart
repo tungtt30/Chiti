@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants.dart';
 import '../../core/formatters.dart';
 import '../../core/id_generator.dart';
 import '../../core/settlement_calculator.dart';
@@ -29,6 +30,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
   final Set<String> _selectedIds = {};
   String _payerId = '';
+  String _category = ExpenseCategory.others;
 
   /// True while prefilled data is being loaded in edit mode; gates the lazy
   /// self-seed branch in build() so it cannot overwrite the loaded values.
@@ -49,6 +51,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
       _titleCtrl.text = e.title;
       _amountCtrl.text = _displayAmount(e.amount);
       _payerId = e.payerId;
+      _category = e.category;
       _loadExisting();
     }
   }
@@ -140,6 +143,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
             title: _titleCtrl.text.trim(),
             amount: total,
             payerId: _payerId,
+            category: _category,
             participants: joined,
           );
     } else {
@@ -147,6 +151,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
         title: _titleCtrl.text.trim(),
         amount: total,
         payerId: _payerId,
+        category: _category,
       );
       await ref
           .read(expensesProvider(widget.tripId).notifier)
@@ -286,6 +291,26 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                     currency: _currency(),
                   ),
                   const SizedBox(height: 16),
+
+                  // ---- Category ----
+                  Text(
+                    'Danh mục',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: ExpenseCategory.all.map((c) {
+                      return ChoiceChip(
+                        avatar: Text(ExpenseCategory.icons[c] ?? '📦'),
+                        label: Text(ExpenseCategory.label(c)),
+                        selected: _category == c,
+                        onSelected: (_) => setState(() => _category = c),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
 
                   // ---- Who paid ----
                   Text(

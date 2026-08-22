@@ -21,6 +21,7 @@ class FakeAppRepository extends AppRepository {
     required String title,
     required double amount,
     required String payerId,
+    required String category,
     required List<ExpenseParticipant> participants,
   }) async {
     final e = Expense(
@@ -29,6 +30,7 @@ class FakeAppRepository extends AppRepository {
       title: title,
       amount: amount,
       payerId: payerId,
+      category: category,
       createdAt: DateTime.now(),
     );
     expenses.add(e);

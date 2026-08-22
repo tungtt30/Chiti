@@ -1,0 +1,140 @@
+import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+
+import '../../../core/formatters.dart';
+import '../../../core/trip_report_text.dart';
+import '../../../data/models/models.dart';
+import '../participant_chips.dart';
+
+/// Section D — One optimized settlement transfer with copy action and settled
+/// toggle: `[Nguyễn A] chuyển cho [Trần B]: 250.000 ₫`.
+class TransferCard extends StatelessWidget {
+  final Settlement settlement;
+  final String fromName;
+  final String toName;
+  final Participant? fromAvatar;
+  final Participant? toAvatar;
+  final String currency;
+  final ValueChanged<bool> onSettledChanged;
+
+  const TransferCard({
+    super.key,
+    required this.settlement,
+    required this.fromName,
+    required this.toName,
+    required this.fromAvatar,
+    required this.toAvatar,
+    required this.currency,
+    required this.onSettledChanged,
+  });
+
+  static final Participant _fallback = Participant(
+        id: '',
+        tripId: '',
+        name: '?',
+        color: 0xFF9E9E9E,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+      );
+
+  Future<void> _copy(BuildContext context, String text) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Đã sao chép vào clipboard')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final settled = settlement.isPaid;
+    final from = fromAvatar ?? _fallback;
+    final to = toAvatar ?? _fallback;
+
+    return Card.outlined(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                ParticipantAvatar(participant: from, radius: 17),
+                const SizedBox(width: 8),
+                Text(
+                  fromName,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    decoration: settled ? TextDecoration.lineThrough : null,
+                    color: settled ? theme.disabledColor : null,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child:
+                      Icon(Icons.arrow_forward, color: theme.colorScheme.primary),
+                ),
+                ParticipantAvatar(participant: to, radius: 17),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    toName,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      decoration: settled ? TextDecoration.lineThrough : null,
+                      color: settled ? theme.disabledColor : null,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '$fromName chuyển cho $toName: '
+              '${formatCurrency(settlement.amount, currency)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Text(
+                  settled ? 'Đã thanh toán' : 'Chưa thanh toán',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: settled
+                        ? Colors.green.shade700
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () => _copy(
+                    context,
+                    buildTransferText(
+                      fromName: fromName,
+                      toName: toName,
+                      amount: settlement.amount,
+                      currency: currency,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  icon: const Icon(Icons.copy, size: 16),
+                  label: const Text('Copy'),
+                ),
+                Checkbox(
+                  value: settled,
+                  onChanged: (v) => onSettledChanged(v ?? false),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

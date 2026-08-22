@@ -185,6 +185,7 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
     required String title,
     required double amount,
     required String payerId,
+    required String category,
     required List<ExpenseParticipant> participants,
   }) async {
     await _repo.createExpense(
@@ -192,6 +193,7 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
       title: title,
       amount: amount,
       payerId: payerId,
+      category: category,
       participants: participants,
     );
     await load();

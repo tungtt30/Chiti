@@ -4,8 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/formatters.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
-import '../widgets/net_balance_list.dart';
-import '../widgets/settlement_card.dart';
+import '../widgets/summary/summary_screen.dart';
 import 'add_edit_expense_screen.dart';
 import 'add_trip_screen.dart';
 import 'expense_detail_screen.dart';
@@ -58,7 +57,7 @@ class TripDetailScreen extends ConsumerWidget {
               children: [
                 _ExpensesTab(tripId: tripId, currency: trip.currency),
                 ManageParticipantsScreen(tripId: tripId),
-                _SummaryTab(tripId: tripId, currency: trip.currency),
+                SummaryScreen(tripId: tripId, currency: trip.currency),
               ],
             ),
             floatingActionButton: FloatingActionButton(
@@ -182,133 +181,3 @@ class _ExpensesTab extends ConsumerWidget {
   }
 }
 
-class _SummaryTab extends ConsumerWidget {
-  final String tripId;
-  final String currency;
-  const _SummaryTab({required this.tripId, required this.currency});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final summaryAsync = ref.watch(summaryProvider(tripId));
-    final settlementsAsync = ref.watch(settlementsProvider(tripId));
-    final participantsAsync = ref.watch(participantsProvider(tripId));
-    final participants = participantsAsync.valueOrNull ?? [];
-    final nameMap = {for (final p in participants) p.id: p.name};
-
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 88),
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-          child: Text(
-            'Net Balance',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        summaryAsync.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.all(24),
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (e, _) => Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text('Error: $e'),
-          ),
-          data: (rows) => rows.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: Text('No data yet. Add expenses.')),
-                )
-              : NetBalanceList(
-                  rows: rows,
-                  participants: participants,
-                  currency: currency,
-                ),
-        ),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
-          child: Text(
-            'Settlement Plan',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: FilledButton.tonalIcon(
-            onPressed: () =>
-                ref.read(settlementsProvider(tripId).notifier).recalculate(),
-            icon: const Icon(Icons.refresh),
-            label: const Text('Calculate / Re-balance'),
-          ),
-        ),
-        const SizedBox(height: 8),
-        settlementsAsync.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.all(24),
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (e, _) => Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text('Error: $e'),
-          ),
-          data: (settlements) {
-            if (settlements.isEmpty) {
-              return Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.check_circle,
-                      size: 48,
-                      color: Colors.green,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'All settled!',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const Text(
-                      'Tap "Calculate / Re-balance" to generate a plan.',
-                    ),
-                  ],
-                ),
-              );
-            }
-            final paidCount = settlements.where((s) => s.isPaid).length;
-            return Column(
-              children: [
-                LinearProgressIndicator(
-                  value: paidCount / settlements.length,
-                  backgroundColor: Theme.of(context)
-                      .colorScheme
-                      .surfaceContainerHigh,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    '$paidCount / ${settlements.length} settlements paid',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-                ...settlements.map((s) {
-                  final fromName = nameMap[s.fromParticipantId] ?? '?';
-                  final toName = nameMap[s.toParticipantId] ?? '?';
-                  return SettlementCard(
-                    fromName: fromName,
-                    toName: toName,
-                    amount: s.amount,
-                    currency: currency,
-                    isPaid: s.isPaid,
-                    onChanged: (paid) => ref
-                        .read(settlementsProvider(tripId).notifier)
-                        .togglePaid(s.id, paid),
-                  );
-                }),
-              ],
-            );
-          },
-        ),
-      ],
-    );
-  }
-}

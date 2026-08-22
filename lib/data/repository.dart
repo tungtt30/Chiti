@@ -125,6 +125,7 @@ class AppRepository {
     required String title,
     required double amount,
     required String payerId,
+    required String category,
     required List<ExpenseParticipant> participants,
   }) async {
     final db = await _helper.database;
@@ -134,6 +135,7 @@ class AppRepository {
       title: title,
       amount: amount,
       payerId: payerId,
+      category: category,
       createdAt: DateTime.now(),
     );
 

@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const int _dbVersion = 3;
+  static const int _dbVersion = 4;
   static Database? _database;
 
   Future<Database> get database async {
@@ -31,13 +31,21 @@ class DatabaseHelper {
     await _createSchema(db);
   }
 
-  /// v2 -> v3 rebuilds the schema for the minimal subset-split model. This app
-  /// targets a fresh offline-first install; for dev releases we recreate the
-  /// tables on upgrade (stored data is cleared).
+  /// v3 -> v4 adds the additive `category` column to expenses (no data loss).
+  /// Older versions (v2) are rebuilt wholesale by _dropSchema + _createSchema.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 3) {
       await _dropSchema(db);
       await _createSchema(db);
+    } else if (oldVersion == 3) {
+      final columns =
+          await db.rawQuery('PRAGMA table_info(expenses)');
+      final hasCategory = columns.any((c) => c['name'] == 'category');
+      if (!hasCategory) {
+        await db.execute(
+          "ALTER TABLE expenses ADD COLUMN category TEXT NOT NULL DEFAULT 'Other'",
+        );
+      }
     }
   }
 
@@ -87,6 +95,7 @@ class DatabaseHelper {
         title TEXT NOT NULL,
         amount REAL NOT NULL,
         payer_id TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'Other',
         created_at INTEGER NOT NULL,
         FOREIGN KEY (trip_id) REFERENCES trips(id) ON DELETE CASCADE,
         FOREIGN KEY (payer_id) REFERENCES participants(id) ON DELETE CASCADE
