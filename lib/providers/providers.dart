@@ -203,9 +203,26 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
     await load();
   }
 
+  Future<void> updateExpense({
+    required Expense expense,
+    required List<ExpensePayer> payers,
+    required List<ExpenseSplit> splits,
+  }) async {
+    await _repo.updateExpense(
+      expense: expense,
+      payers: payers,
+      splits: splits,
+    );
+    await load();
+    // Recompute the who-owes-whom plan so balances reflect the edit immediately.
+    await ref.read(settlementsProvider(tripId).notifier).recalculate();
+  }
+
   Future<void> deleteExpense(String id) async {
     await _repo.deleteExpense(id);
     await load();
+    // Recompute the who-owes-whom plan after removing the expense.
+    await ref.read(settlementsProvider(tripId).notifier).recalculate();
   }
 }
 

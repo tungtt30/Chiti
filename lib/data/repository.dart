@@ -167,6 +167,55 @@ class AppRepository {
     return expense;
   }
 
+  /// Updates an expense row and replaces its payer / split rows in a single
+  /// transaction. Old child rows are deleted and re-inserted wholesale because
+  /// they carry their own UUIDs and the clearest push-based refresh is to
+  /// recreate them.
+  Future<void> updateExpense({
+    required Expense expense,
+    required List<ExpensePayer> payers,
+    required List<ExpenseSplit> splits,
+  }) async {
+    final db = await _helper.database;
+    await db.transaction((txn) async {
+      await txn.update(
+        'expenses',
+        expense.toMap(),
+        where: 'id = ?',
+        whereArgs: [expense.id],
+      );
+
+      await txn.delete(
+        'expense_payers',
+        where: 'expense_id = ?',
+        whereArgs: [expense.id],
+      );
+      await txn.delete(
+        'expense_splits',
+        where: 'expense_id = ?',
+        whereArgs: [expense.id],
+      );
+
+      final payerBatch = txn.batch();
+      for (final payer in payers) {
+        payerBatch.insert(
+          'expense_payers',
+          payer.copyWith(expenseId: expense.id).toMap(),
+        );
+      }
+      await payerBatch.commit(noResult: true);
+
+      final splitBatch = txn.batch();
+      for (final split in splits) {
+        splitBatch.insert(
+          'expense_splits',
+          split.copyWith(expenseId: expense.id).toMap(),
+        );
+      }
+      await splitBatch.commit(noResult: true);
+    });
+  }
+
   Future<void> deleteExpense(String id) async {
     final db = await _helper.database;
     await db.delete('expenses', where: 'id = ?', whereArgs: [id]);

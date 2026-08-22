@@ -7,7 +7,7 @@ import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../widgets/summary_table.dart';
 import '../widgets/settlement_card.dart';
-import 'add_expense_screen.dart';
+import 'add_edit_expense_screen.dart';
 import 'add_trip_screen.dart';
 import 'manage_participants_screen.dart';
 
@@ -66,7 +66,7 @@ class TripDetailScreen extends ConsumerWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => AddExpenseScreen(tripId: tripId),
+                    builder: (_) => AddEditExpenseScreen(tripId: tripId),
                   ),
                 );
               },
@@ -167,6 +167,15 @@ class _ExpensesTab extends ConsumerWidget {
                   formatCurrency(e.amount, currency),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          AddEditExpenseScreen(tripId: tripId, existing: e),
+                    ),
+                  );
+                },
               ),
             );
           },
