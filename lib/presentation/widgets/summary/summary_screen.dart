@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/settlement_calculator.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/providers.dart';
 import '../../../providers/trip_summary_provider.dart';
@@ -22,8 +23,16 @@ class SummaryScreen extends ConsumerWidget {
     final statsAsync = ref.watch(tripSummaryProvider(tripId));
     final participants =
         ref.watch(participantsProvider(tripId)).valueOrNull ?? [];
+    final trip = ref.watch(tripDetailProvider(tripId)).valueOrNull;
     final nameMap = {for (final p in participants) p.id: p.name};
     final avatarMap = {for (final p in participants) p.id: p};
+
+    // Effective host: stored one, else the first member (legacy trips).
+    final isHostMode =
+        trip != null && SettlementMode.fromDbValue(trip.settlementMode) == SettlementMode.host;
+    final hostId = trip?.hostId ??
+        (participants.isNotEmpty ? participants.first.id : null);
+    final hostName = hostId != null ? nameMap[hostId] : null;
 
     return statsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -71,6 +80,17 @@ class SummaryScreen extends ConsumerWidget {
             _SectionHeader(
               icon: Icons.swap_horiz_rounded,
               title: l10n.settlementPlanTitle,
+              trailing: isHostMode && hostName != null
+                  ? Tooltip(
+                      message: l10n.settlementModeHostLabel,
+                      child: Chip(
+                        avatar: const Icon(Icons.emoji_events, size: 16),
+                        label: Text('👑 $hostName'),
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                      ),
+                    )
+                  : null,
             ),
             if (stats.settlements.isEmpty)
               Card.outlined(
@@ -124,6 +144,7 @@ class SummaryScreen extends ConsumerWidget {
                     fromAvatar: avatarMap[s.fromParticipantId],
                     toAvatar: avatarMap[s.toParticipantId],
                     currency: currency,
+                    hostName: isHostMode ? hostName : null,
                     onSettledChanged: (paid) => ref
                         .read(settlementsProvider(tripId).notifier)
                         .togglePaid(s.id, paid),
@@ -141,7 +162,8 @@ class SummaryScreen extends ConsumerWidget {
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
-  const _SectionHeader({required this.icon, required this.title});
+  final Widget? trailing;
+  const _SectionHeader({required this.icon, required this.title, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +180,8 @@ class _SectionHeader extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+          const Spacer(),
+          ?trailing,
         ],
       ),
     );

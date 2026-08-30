@@ -204,6 +204,28 @@
   "memberAuditTitle": "Bảng đối soát thành viên",
   "categoryAnalysisTitle": "Phân tích danh mục",
   "settlementPlanTitle": "Kế hoạch thanh toán tối ưu",
+  "settlementModeTitle": "Cài đặt thanh toán",
+  "settlementModeHostLabel": "Thủ quỹ (Host)",
+  "settlementModeHostHint": "Người nợ chuyển tiền cho thủ quỹ; thủ quỹ hoàn tiền cho người được trả",
+  "settlementModePeerToPeerLabel": "Chuyển trực tiếp (peer-to-peer)",
+  "selectHost": "Thủ quỹ",
+  "hostBadge": "Thủ quỹ",
+  "hostIs": "Thủ quỹ: {name}",
+  "@hostIs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hostTransferSuffix": "(qua thủ quỹ {host})",
+  "@hostTransferSuffix": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
   "recalculate": "Tính / Cân đối lại",
   "allSettledNoTransfer": "Đã cân bằng, không cần chuyển khoản 🎉",
   "paidProgress": "Đã thanh toán: {count}/{total}",

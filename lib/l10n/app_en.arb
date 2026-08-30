@@ -208,6 +208,28 @@
   "memberAuditTitle": "Member Audit",
   "categoryAnalysisTitle": "Category Analysis",
   "settlementPlanTitle": "Settlement Plan",
+  "settlementModeTitle": "Settlement settings",
+  "settlementModeHostLabel": "Host / Treasurer (Thủ quỹ)",
+  "settlementModeHostHint": "Debtors transfer to the host; the host refunds creditors",
+  "settlementModePeerToPeerLabel": "Peer-to-peer",
+  "selectHost": "Host (Thủ quỹ)",
+  "hostBadge": "Host / Treasurer",
+  "hostIs": "Host: {name}",
+  "@hostIs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hostTransferSuffix": "(via {host})",
+  "@hostTransferSuffix": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
   "recalculate": "Recalculate",
   "allSettledNoTransfer": "All settled, no transfers needed 🎉",
   "paidProgress": "Paid: {count} of {total}",

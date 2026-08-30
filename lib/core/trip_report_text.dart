@@ -11,8 +11,10 @@ String buildTripReportText({
   required String currency,
   required TripSummaryStats stats,
   required Map<String, String> nameMap,
+  String? hostId,
 }) {
   final buf = StringBuffer();
+  final hostName = hostId != null ? nameMap[hostId] : null;
 
   buf.writeln('🧾 ${l10n.reportTitle(tripName)}');
   buf.writeln(
@@ -64,12 +66,17 @@ String buildTripReportText({
     for (final s in stats.settlements) {
       final from = nameMap[s.fromParticipantId] ?? '?';
       final to = nameMap[s.toParticipantId] ?? '?';
+      // Annotate transfers that involve the Host / Thủ quỹ.
+      final viaHost = hostName != null &&
+          (s.fromParticipantId == hostId || s.toParticipantId == hostId);
       buf.writeln(
         l10n.reportSettlementLine(
           from,
           to,
           formatCurrency(s.amount, currency),
-          s.isPaid ? ' ✅' : '',
+          s.isPaid
+              ? ' ✅'
+              : (viaHost ? l10n.hostTransferSuffix(hostName) : ''),
         ),
       );
     }
@@ -91,6 +98,12 @@ String buildTransferText({
   required String toName,
   required double amount,
   required String currency,
+  String? hostName,
 }) {
-  return l10n.transferReportLine(fromName, toName, formatCurrency(amount, currency));
+  final base = l10n.transferReportLine(
+    fromName,
+    toName,
+    formatCurrency(amount, currency),
+  );
+  return hostName == null ? base : '$base ${l10n.hostTransferSuffix(hostName)}';
 }

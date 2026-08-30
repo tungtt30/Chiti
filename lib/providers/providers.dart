@@ -87,9 +87,19 @@ class TripDetailNotifier extends StateNotifier<AsyncValue<Trip?>> {
   }
 
   Future<void> updateTrip(Trip trip) async {
+    // Recompute the settlement plan only when the mode or the Host changed;
+    // other edits (name/dates/currency) must not wipe paid checkboxes.
+    final previous = state.valueOrNull;
+    final settlementChanged = previous == null ||
+        previous.hostId != trip.hostId ||
+        previous.settlementMode != trip.settlementMode;
+
     await _repo.updateTrip(trip);
     await load();
     ref.invalidate(tripListProvider);
+    if (settlementChanged) {
+      await ref.read(settlementsProvider(tripId).notifier).recalculate();
+    }
   }
 }
 
@@ -130,13 +140,22 @@ class ParticipantsNotifier
     String? contact,
     String? note,
   }) async {
-    await _repo.addParticipant(
+    final participant = await _repo.addParticipant(
       tripId: tripId,
       name: name,
       color: color,
       contact: contact,
       note: note,
     );
+    // The first member of a trip becomes the Host / Thủ quỹ by default.
+    final trip = ref.read(tripDetailProvider(tripId)).valueOrNull;
+    if (trip != null &&
+        trip.hostId == null &&
+        (state.valueOrNull?.length ?? 0) == 0) {
+      await ref
+          .read(tripDetailProvider(tripId).notifier)
+          .updateTrip(trip.copyWith(hostId: participant.id));
+    }
     await load();
   }
 
@@ -148,6 +167,16 @@ class ParticipantsNotifier
   Future<void> removeParticipant(String id) async {
     await _repo.removeParticipant(id);
     await load();
+    // If the removed member was the Host, reassign the role to the first
+    // remaining participant (or clear it when nobody is left).
+    final trip = ref.read(tripDetailProvider(tripId)).valueOrNull;
+    if (trip != null && trip.hostId == id) {
+      final remaining = state.valueOrNull ?? const <Participant>[];
+      final nextHost = remaining.isNotEmpty ? remaining.first.id : null;
+      await ref
+          .read(tripDetailProvider(tripId).notifier)
+          .updateTrip(trip.copyWith(hostId: nextHost, clearHost: nextHost == null));
+    }
   }
 }
 
@@ -315,22 +344,37 @@ class SettlementsNotifier extends StateNotifier<AsyncValue<List<Settlement>>> {
     }
   }
 
-  /// Re-runs the greedy settlement engine and persists the new plan.
+  /// Re-runs the settlement engine (host or peer-to-peer) and persists the
+  /// new plan.
   Future<void> recalculate() async {
     state = const AsyncValue.loading();
     try {
+      final trip = ref.read(tripDetailProvider(tripId)).valueOrNull;
+      final participants =
+          ref.read(participantsProvider(tripId)).valueOrNull ?? [];
       final rows = await ref.read(summaryProvider(tripId).future);
       final balances = {for (final r in rows) r.participantId: r.net};
-      final transfers = simplifyDebts(balances);
+
+      // Effective host: the stored one, else the first member (keeps legacy
+      // trips with no host_id working in host mode).
+      final hostId = trip?.hostId ??
+          (participants.isNotEmpty ? participants.first.id : null);
+      final mode = SettlementMode.fromDbValue(trip?.settlementMode);
+
+      final transactions = computeSettlementPlan(
+        balances: balances,
+        mode: mode,
+        hostId: hostId,
+      );
       final createdAt = DateTime.now();
 
-      final pledges = transfers
+      final pledges = transactions
           .map(
             (t) => Settlement(
               id: generateId(),
               tripId: tripId,
-              fromParticipantId: t.from,
-              toParticipantId: t.to,
+              fromParticipantId: t.fromParticipantId,
+              toParticipantId: t.toParticipantId,
               amount: t.amount,
               isPaid: false,
               createdAt: createdAt,

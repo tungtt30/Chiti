@@ -9,6 +9,9 @@ import '../participant_chips.dart';
 
 /// Section D — One optimized settlement transfer with copy action and settled
 /// toggle: `[Nguyễn A] chuyển cho [Trần B]: 250.000 ₫`.
+///
+/// When [hostName] is provided, the transfer involves the Host / Thủ quỹ and
+/// gets a badge plus a "via `host`" suffix in the copied text.
 class TransferCard extends StatelessWidget {
   final Settlement settlement;
   final String fromName;
@@ -16,6 +19,7 @@ class TransferCard extends StatelessWidget {
   final Participant? fromAvatar;
   final Participant? toAvatar;
   final String currency;
+  final String? hostName;
   final ValueChanged<bool> onSettledChanged;
 
   const TransferCard({
@@ -26,6 +30,7 @@ class TransferCard extends StatelessWidget {
     required this.fromAvatar,
     required this.toAvatar,
     required this.currency,
+    this.hostName,
     required this.onSettledChanged,
   });
 
@@ -92,12 +97,29 @@ class TransferCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text(
-              l10n.transferLine(fromName, toName, formatCurrency(settlement.amount, currency)),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
+            Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    l10n.transferLine(
+                      fromName,
+                      toName,
+                      formatCurrency(settlement.amount, currency),
+                    ),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                if (hostName != null) ...[
+                  const SizedBox(width: 6),
+                  Tooltip(
+                    message: l10n.hostTransferSuffix(hostName!),
+                    child: const Icon(Icons.emoji_events, size: 16),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 4),
             Row(
@@ -122,6 +144,7 @@ class TransferCard extends StatelessWidget {
                       toName: toName,
                       amount: settlement.amount,
                       currency: currency,
+                      hostName: hostName,
                     ),
                   ),
                   style: TextButton.styleFrom(

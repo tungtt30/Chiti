@@ -303,6 +303,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settlementPlanTitle => 'Settlement Plan';
 
   @override
+  String get settlementModeTitle => 'Settlement settings';
+
+  @override
+  String get settlementModeHostLabel => 'Host / Treasurer (Thủ quỹ)';
+
+  @override
+  String get settlementModeHostHint =>
+      'Debtors transfer to the host; the host refunds creditors';
+
+  @override
+  String get settlementModePeerToPeerLabel => 'Peer-to-peer';
+
+  @override
+  String get selectHost => 'Host (Thủ quỹ)';
+
+  @override
+  String get hostBadge => 'Host / Treasurer';
+
+  @override
+  String hostIs(String name) {
+    return 'Host: $name';
+  }
+
+  @override
+  String hostTransferSuffix(String host) {
+    return '(via $host)';
+  }
+
+  @override
   String get recalculate => 'Recalculate';
 
   @override

@@ -303,6 +303,35 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settlementPlanTitle => 'Kế hoạch thanh toán tối ưu';
 
   @override
+  String get settlementModeTitle => 'Cài đặt thanh toán';
+
+  @override
+  String get settlementModeHostLabel => 'Thủ quỹ (Host)';
+
+  @override
+  String get settlementModeHostHint =>
+      'Người nợ chuyển tiền cho thủ quỹ; thủ quỹ hoàn tiền cho người được trả';
+
+  @override
+  String get settlementModePeerToPeerLabel => 'Chuyển trực tiếp (peer-to-peer)';
+
+  @override
+  String get selectHost => 'Thủ quỹ';
+
+  @override
+  String get hostBadge => 'Thủ quỹ';
+
+  @override
+  String hostIs(String name) {
+    return 'Thủ quỹ: $name';
+  }
+
+  @override
+  String hostTransferSuffix(String host) {
+    return '(qua thủ quỹ $host)';
+  }
+
+  @override
   String get recalculate => 'Tính / Cân đối lại';
 
   @override

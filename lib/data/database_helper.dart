@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const int _dbVersion = 4;
+  static const int _dbVersion = 5;
   static Database? _database;
 
   Future<Database> get database async {
@@ -31,20 +31,37 @@ class DatabaseHelper {
     await _createSchema(db);
   }
 
-  /// v3 -> v4 adds the additive `category` column to expenses (no data loss).
-  /// Older versions (v2) are rebuilt wholesale by _dropSchema + _createSchema.
+  /// v3 -> v4 adds the additive `category` column to expenses.
+  /// v4 -> v5 adds `host_id` + `settlement_mode` to trips (host/treasurer
+  /// settlement mode). All steps are additive and applied for any older
+  /// version, so upgrading from v3 straight to v5 also works.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 3) {
       await _dropSchema(db);
       await _createSchema(db);
-    } else if (oldVersion == 3) {
-      final columns =
-          await db.rawQuery('PRAGMA table_info(expenses)');
-      final hasCategory = columns.any((c) => c['name'] == 'category');
-      if (!hasCategory) {
-        await db.execute(
-          "ALTER TABLE expenses ADD COLUMN category TEXT NOT NULL DEFAULT 'Other'",
-        );
+    } else {
+      if (oldVersion <= 3) {
+        final columns =
+            await db.rawQuery('PRAGMA table_info(expenses)');
+        final hasCategory = columns.any((c) => c['name'] == 'category');
+        if (!hasCategory) {
+          await db.execute(
+            "ALTER TABLE expenses ADD COLUMN category TEXT NOT NULL DEFAULT 'Other'",
+          );
+        }
+      }
+      if (oldVersion <= 4) {
+        final columns = await db.rawQuery('PRAGMA table_info(trips)');
+        if (!columns.any((c) => c['name'] == 'host_id')) {
+          await db.execute(
+            'ALTER TABLE trips ADD COLUMN host_id TEXT',
+          );
+        }
+        if (!columns.any((c) => c['name'] == 'settlement_mode')) {
+          await db.execute(
+            "ALTER TABLE trips ADD COLUMN settlement_mode TEXT NOT NULL DEFAULT 'host'",
+          );
+        }
       }
     }
   }
@@ -71,7 +88,9 @@ class DatabaseHelper {
         currency TEXT NOT NULL,
         start_date INTEGER NOT NULL,
         end_date INTEGER NOT NULL,
-        created_at INTEGER NOT NULL
+        created_at INTEGER NOT NULL,
+        host_id TEXT,
+        settlement_mode TEXT NOT NULL DEFAULT 'host'
       )
     ''');
 

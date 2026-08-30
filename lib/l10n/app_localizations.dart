@@ -626,6 +626,54 @@ abstract class AppLocalizations {
   /// **'Settlement Plan'**
   String get settlementPlanTitle;
 
+  /// No description provided for @settlementModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement settings'**
+  String get settlementModeTitle;
+
+  /// No description provided for @settlementModeHostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Host / Treasurer (Thủ quỹ)'**
+  String get settlementModeHostLabel;
+
+  /// No description provided for @settlementModeHostHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Debtors transfer to the host; the host refunds creditors'**
+  String get settlementModeHostHint;
+
+  /// No description provided for @settlementModePeerToPeerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Peer-to-peer'**
+  String get settlementModePeerToPeerLabel;
+
+  /// No description provided for @selectHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Host (Thủ quỹ)'**
+  String get selectHost;
+
+  /// No description provided for @hostBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Host / Treasurer'**
+  String get hostBadge;
+
+  /// No description provided for @hostIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Host: {name}'**
+  String hostIs(String name);
+
+  /// No description provided for @hostTransferSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'(via {host})'**
+  String hostTransferSuffix(String host);
+
   /// No description provided for @recalculate.
   ///
   /// In en, this message translates to:

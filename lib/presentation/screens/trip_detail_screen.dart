@@ -94,6 +94,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
       currency: trip.currency,
       stats: stats,
       nameMap: nameMap,
+      hostId: trip.hostId,
     );
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;

@@ -7,6 +7,79 @@ library;
 
 import 'constants.dart' show SplitMode;
 
+/// How a trip settles its balances: centralized through a Host (Thủ quỹ) or
+/// direct peer-to-peer transfers.
+enum SettlementMode {
+  host,
+  peerToPeer;
+
+  /// Persisted value in the `trips.settlement_mode` column.
+  String get dbValue => switch (this) {
+    SettlementMode.host => 'host',
+    SettlementMode.peerToPeer => 'peer_to_peer',
+  };
+
+  static SettlementMode fromDbValue(String? value) {
+    return switch (value) {
+      'peer_to_peer' => SettlementMode.peerToPeer,
+      _ => SettlementMode.host,
+    };
+  }
+}
+
+/// Direction of a settlement transaction relative to the Host.
+enum TransactionType {
+  /// A debtor transfers money *to* the Host (Thu tiền về Thủ quỹ).
+  inbound,
+
+  /// The Host transfers money *to* a creditor (Thủ quỹ hoàn tiền).
+  outbound,
+
+  /// A direct peer-to-peer transfer (no Host involvement).
+  peerToPeer,
+}
+
+/// One settlement transaction produced by the settlement engine:
+/// [fromParticipantId] pays [amount] to [toParticipantId].
+class SettlementTransaction {
+  final String fromParticipantId;
+  final String toParticipantId;
+  final double amount;
+  final bool isHostTransaction; // true if involving host
+  final TransactionType type; // inbound (to host) or outbound (from host)
+
+  const SettlementTransaction({
+    required this.fromParticipantId,
+    required this.toParticipantId,
+    required this.amount,
+    this.isHostTransaction = true,
+    required this.type,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SettlementTransaction &&
+          runtimeType == other.runtimeType &&
+          fromParticipantId == other.fromParticipantId &&
+          toParticipantId == other.toParticipantId &&
+          amount == other.amount &&
+          isHostTransaction == other.isHostTransaction &&
+          type == other.type;
+
+  @override
+  int get hashCode =>
+      fromParticipantId.hashCode ^
+      toParticipantId.hashCode ^
+      amount.hashCode ^
+      isHostTransaction.hashCode ^
+      type.hashCode;
+
+  @override
+  String toString() =>
+      '$fromParticipantId pays $amount to $toParticipantId ($type)';
+}
+
 class Transfer {
   final String from;
   final String to;
@@ -160,6 +233,77 @@ List<Transfer> simplifyDebts(Map<String, double> balances) {
   }
 
   return transfers;
+}
+
+/// Compute the settlement plan for a trip, honoring the settlement [mode].
+///
+/// **Host mode** (Mô hình thanh toán tập trung qua Thủ quỹ):
+/// 1. Inbound phase (Thu tiền về Host): every debtor `i != host` with
+///    `Net_i < 0` transfers `|Net_i|` to the Host.
+/// 2. Outbound phase (Host hoàn tiền): every creditor `j != host` with
+///    `Net_j > 0` receives `Net_j` from the Host.
+///
+/// Because `sum(Net) = 0`, the Host self-balances:
+/// `Net_H + D_H - C_H = 0`, i.e. `C_H - D_H = Net_H`:
+/// - Host owes money (`Net_H < 0`): the Host disburses `|Net_H|` more than it
+///   collects — the exact shortfall it pays out of pocket.
+/// - Host is owed (`Net_H > 0`): the Host collects `Net_H` more than it
+///   disburses — exactly what the group owes the Host.
+/// - Host balanced (`Net_H = 0`): `C_H = D_H`.
+/// Either way the Host never needs a transaction of its own.
+///
+/// **Peer-to-peer mode**: delegates to the greedy [simplifyDebts] algorithm.
+///
+/// If [mode] is host but [hostId] is null or not present in [balances]
+/// (e.g. a legacy trip with no members), the plan falls back to the
+/// peer-to-peer result so it never breaks.
+List<SettlementTransaction> computeSettlementPlan({
+  required Map<String, double> balances,
+  required SettlementMode mode,
+  String? hostId,
+}) {
+  if (mode == SettlementMode.peerToPeer || hostId == null ||
+      !balances.containsKey(hostId)) {
+    return simplifyDebts(balances)
+        .map(
+          (t) => SettlementTransaction(
+            fromParticipantId: t.from,
+            toParticipantId: t.to,
+            amount: t.amount,
+            isHostTransaction: false,
+            type: TransactionType.peerToPeer,
+          ),
+        )
+        .toList();
+  }
+
+  final plan = <SettlementTransaction>[];
+  for (final entry in balances.entries) {
+    if (entry.key == hostId) continue;
+    final net = _round2(entry.value);
+    if (net < -0.01) {
+      plan.add(
+        SettlementTransaction(
+          fromParticipantId: entry.key,
+          toParticipantId: hostId,
+          amount: _round2(-net),
+          isHostTransaction: true,
+          type: TransactionType.inbound,
+        ),
+      );
+    } else if (net > 0.01) {
+      plan.add(
+        SettlementTransaction(
+          fromParticipantId: hostId,
+          toParticipantId: entry.key,
+          amount: net,
+          isHostTransaction: true,
+          type: TransactionType.outbound,
+        ),
+      );
+    }
+  }
+  return plan;
 }
 
 /// Round-robin distribute [total] among [count] shares so each share is

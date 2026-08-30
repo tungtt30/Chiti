@@ -1,3 +1,5 @@
+import '../../core/settlement_calculator.dart' show SettlementMode;
+
 class Trip {
   final String id;
   final String name;
@@ -7,6 +9,13 @@ class Trip {
   final DateTime endDate;
   final DateTime createdAt;
 
+  /// Designated Host / Treasurer (Thủ quỹ) for host-mode settlement, or null
+  /// when none is assigned (legacy trips / no members yet).
+  final String? hostId;
+
+  /// How this trip settles balances: `'host'` or `'peer_to_peer'`.
+  final String settlementMode;
+
   const Trip({
     required this.id,
     required this.name,
@@ -15,6 +24,8 @@ class Trip {
     required this.startDate,
     required this.endDate,
     required this.createdAt,
+    this.hostId,
+    this.settlementMode = 'host',
   });
 
   Trip copyWith({
@@ -23,6 +34,9 @@ class Trip {
     String? currency,
     DateTime? startDate,
     DateTime? endDate,
+    String? hostId,
+    String? settlementMode,
+    bool clearHost = false,
   }) {
     return Trip(
       id: id,
@@ -32,6 +46,8 @@ class Trip {
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       createdAt: createdAt,
+      hostId: clearHost ? null : (hostId ?? this.hostId),
+      settlementMode: settlementMode ?? this.settlementMode,
     );
   }
 
@@ -44,6 +60,8 @@ class Trip {
       'start_date': startDate.millisecondsSinceEpoch,
       'end_date': endDate.millisecondsSinceEpoch,
       'created_at': createdAt.millisecondsSinceEpoch,
+      'host_id': hostId,
+      'settlement_mode': settlementMode,
     };
   }
 
@@ -56,6 +74,9 @@ class Trip {
       startDate: DateTime.fromMillisecondsSinceEpoch(map['start_date'] as int),
       endDate: DateTime.fromMillisecondsSinceEpoch(map['end_date'] as int),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+      hostId: map['host_id'] as String?,
+      settlementMode: (map['settlement_mode'] as String?) ??
+          SettlementMode.host.dbValue,
     );
   }
 }
