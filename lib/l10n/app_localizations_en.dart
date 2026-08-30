@@ -45,6 +45,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSectionTitle => 'Language';
 
   @override
+  String get themeSectionTitle => 'Theme';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeSakura => 'Sakura · Cherry Blossom';
+
+  @override
+  String get petalsToggle => 'Falling petals';
+
+  @override
+  String get petalsHint => 'Turn off to save battery';
+
+  @override
   String get systemDefault => 'System default';
 
   @override

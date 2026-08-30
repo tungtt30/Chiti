@@ -25,6 +25,12 @@
 
   "settingsTitle": "Settings",
   "languageSectionTitle": "Language",
+  "themeSectionTitle": "Theme",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSakura": "Sakura · Cherry Blossom",
+  "petalsToggle": "Falling petals",
+  "petalsHint": "Turn off to save battery",
   "systemDefault": "System default",
   "englishLanguage": "English",
   "vietnameseLanguage": "Tiếng Việt",

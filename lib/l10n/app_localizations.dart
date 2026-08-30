@@ -164,6 +164,42 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get languageSectionTitle;
 
+  /// No description provided for @themeSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeSectionTitle;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeSakura.
+  ///
+  /// In en, this message translates to:
+  /// **'Sakura · Cherry Blossom'**
+  String get themeSakura;
+
+  /// No description provided for @petalsToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Falling petals'**
+  String get petalsToggle;
+
+  /// No description provided for @petalsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off to save battery'**
+  String get petalsHint;
+
   /// No description provided for @systemDefault.
   ///
   /// In en, this message translates to:

@@ -45,6 +45,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get languageSectionTitle => 'Ngôn ngữ';
 
   @override
+  String get themeSectionTitle => 'Giao diện';
+
+  @override
+  String get themeLight => 'Sáng';
+
+  @override
+  String get themeDark => 'Tối';
+
+  @override
+  String get themeSakura => 'Sakura · Hoa anh đào';
+
+  @override
+  String get petalsToggle => 'Cánh hoa rơi';
+
+  @override
+  String get petalsHint => 'Tắt để tiết kiệm pin';
+
+  @override
   String get systemDefault => 'Theo hệ thống';
 
   @override

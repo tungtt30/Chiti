@@ -6,12 +6,15 @@ import 'package:quick_actions/quick_actions.dart';
 
 import 'core/services/quick_actions_service.dart';
 import 'core/services/widget_service.dart';
+import 'core/theme/sakura_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'presentation/screens/add_edit_expense_screen.dart';
 import 'presentation/screens/add_trip_screen.dart';
 import 'presentation/screens/trip_dashboard_screen.dart';
 import 'presentation/screens/trip_detail_screen.dart';
+import 'presentation/widgets/petals_animation.dart';
 import 'providers/locale_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -114,27 +117,51 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeProvider);
+    final themeMode = ref.watch(themeProvider);
+    final petalsEnabled =
+        ref.watch(petalsEnabledProvider) && themeMode == AppThemeMode.sakura;
+
+    final lightTheme = ThemeData(
+      colorSchemeSeed: Colors.teal,
+      useMaterial3: true,
+      brightness: Brightness.light,
+    );
+    final darkTheme = ThemeData(
+      colorSchemeSeed: Colors.teal,
+      useMaterial3: true,
+      brightness: Brightness.dark,
+    );
+    final isSakura = themeMode == AppThemeMode.sakura;
 
     return MaterialApp(
       navigatorKey: _navigatorKey,
       onGenerateTitle: (context) =>
           AppLocalizations.of(context)?.appTitle ?? 'Chiti',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.teal,
-        useMaterial3: true,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        colorSchemeSeed: Colors.teal,
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
-      themeMode: ThemeMode.system,
+      theme: isSakura ? SakuraTheme.themeData : lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode == AppThemeMode.system
+          ? ThemeMode.system
+          : themeMode == AppThemeMode.dark
+          ? ThemeMode.dark
+          : ThemeMode.light,
       locale: locale,
       supportedLocales: const [Locale('vi'), Locale('en')],
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       home: const TripDashboardScreen(),
+      builder: (context, child) => Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background layer: soft pink + falling petals sit BEHIND the
+          // Navigator's content (Scaffolds are transparent in the Sakura
+          // theme so this layer shows through everywhere).
+          if (isSakura)
+            Positioned.fill(
+              child: PetalField(enabled: petalsEnabled),
+            ),
+          ?child,
+        ],
+      ),
     );
   }
 }

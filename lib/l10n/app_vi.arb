@@ -21,6 +21,12 @@
 
   "settingsTitle": "Cài đặt",
   "languageSectionTitle": "Ngôn ngữ",
+  "themeSectionTitle": "Giao diện",
+  "themeLight": "Sáng",
+  "themeDark": "Tối",
+  "themeSakura": "Sakura · Hoa anh đào",
+  "petalsToggle": "Cánh hoa rơi",
+  "petalsHint": "Tắt để tiết kiệm pin",
   "systemDefault": "Theo hệ thống",
   "englishLanguage": "English",
   "vietnameseLanguage": "Tiếng Việt",
