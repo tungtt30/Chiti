@@ -3,8 +3,8 @@
 Offline-first Flutter app for tracking shared expenses within any group —
 sports clubs (badminton, football), dining out, roommate living costs,
 hangouts, and trips — and settling balances among members. Data lives
-on-device in SQLite, so it works fully offline. **Android & iOS only**
-(desktop/web out of scope).
+on-device in SQLite, so it works fully offline. **Android only** (iOS,
+desktop/web out of scope).
 
 ## Features
 
@@ -60,20 +60,21 @@ matching the largest debtor (biggest negative net) with the largest creditor
 (`[A] pays 150,000 VND to [B]`). Unit tested in `test/core/settlement_calculator_test.dart`
 via `flutter test`.
 
-## Getting started (Android & iOS)
+## Getting started (Android)
 
-Requirements: Flutter **3.47+** stable and a configured toolchain for your target.
+Requirements: Flutter **3.47+** stable and an Android toolchain (device or
+emulator).
 
 ```sh
 flutter pub get
-flutter run                      # pick an Android emulator or iOS simulator
+flutter run                      # pick an Android device/emulator
 flutter test                     # runs unit + widget tests
 ```
 
 ### Android setup
 
 1. The app needs no network permission — SQLite is internal storage only.
-2. `android/app/build.gradle` already uses Flutter defaults. If you set a custom
+2. `android/app/build.gradle.kts` already uses Flutter defaults. If you set a custom
    `minSdkVersion`, keep it `>= 21` (sqflite requirement, current default is
    fine).
 3. Run:
@@ -81,18 +82,6 @@ flutter test                     # runs unit + widget tests
    flutter run -d <android-device>
    # or a release APK:
    flutter build apk --release
-   ```
-
-### iOS setup
-
-1. `sqflite` uses CocoaPods. With Flutter 3.38+, no `Podfile` is required — one
-   is generated on first iOS build, but if needed run `pod install` inside
-   `ios/`.
-2. No Info.plist permission keys are required (no camera/network/location).
-3. Run:
-   ```sh
-   flutter run -d <ios-simulator>
-   flutter build ios --release --no-codesign   # CI/simulator build
    ```
 
 ### Data & migrations
@@ -117,15 +106,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
+  flutter_localizations:
+    sdk: flutter
   flutter_riverpod: ^2.6.1   # state management
   sqflite: ^2.4.2           # local SQLite
   path: ^1.9.1              # path joins for the DB
   path_provider: ^2.1.5
   intl: ^0.20.2             # currency & date formatting
   uuid: ^4.5.1              # user ids
+  shared_preferences: ^2.3.5
   share_plus: ^10.0.0       # share captured report images
   gal: ^2.3.0               # save captured report images to gallery
+  home_widget: ^0.9.3       # Android home-screen widget
+  quick_actions: ^1.0.8     # Android launcher app-icon shortcuts
 
 dev_dependencies:
   flutter_test:
