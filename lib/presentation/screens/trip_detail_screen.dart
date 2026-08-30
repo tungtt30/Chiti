@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants.dart';
 import '../../core/formatters.dart';
+import '../../core/services/recent_group_service.dart';
 import '../../core/trip_report_text.dart';
 import '../../core/utils/image_exporter.dart';
 import '../../data/models/models.dart';
@@ -23,7 +24,21 @@ import 'manage_participants_screen.dart';
 
 class TripDetailScreen extends ConsumerStatefulWidget {
   final String tripId;
-  const TripDetailScreen({super.key, required this.tripId});
+
+  /// Which tab to open on first build (0 = Expenses, 2 = Summary). Used by
+  /// quick actions and widget deep links.
+  final int initialTab;
+
+  /// Invoked when the member list requests the Summary tab (long-press ->
+  /// "View expense history").
+  final VoidCallback? onOpenSummary;
+
+  const TripDetailScreen({
+    super.key,
+    required this.tripId,
+    this.initialTab = 0,
+    this.onOpenSummary,
+  });
 
   @override
   ConsumerState<TripDetailScreen> createState() => _TripDetailScreenState();
@@ -39,7 +54,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    // Opening a group marks it as the target of the quick actions.
+    RecentGroupService.saveRecentGroup(_tripId);
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTab.clamp(0, 2),
+    );
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         setState(() => _currentTab = _tabController.index);
@@ -353,7 +374,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
             controller: _tabController,
             children: [
               _ExpensesTab(tripId: _tripId, currency: trip.currency),
-              ManageParticipantsScreen(tripId: _tripId),
+              ManageParticipantsScreen(
+                tripId: _tripId,
+                onOpenSummary: widget.onOpenSummary ??
+                    () => _tabController.animateTo(2),
+              ),
               SummaryScreen(tripId: _tripId, currency: trip.currency),
             ],
           ),
@@ -376,6 +401,105 @@ class _ExpensesTab extends ConsumerWidget {
   final String tripId;
   final String currency;
   const _ExpensesTab({required this.tripId, required this.currency});
+
+  /// Long-press action sheet for an expense: edit, duplicate, delete.
+  Future<void> _showExpenseActions(
+    BuildContext context,
+    WidgetRef ref,
+    Expense e,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(e.title, overflow: TextOverflow.ellipsis),
+              subtitle: Text(
+                formatCurrency(e.amount, currency),
+                style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: Text(l10n.editExpenseAction),
+              onTap: () => Navigator.pop(sheetContext, 'edit'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.copy_outlined),
+              title: Text(l10n.duplicateExpenseAction),
+              onTap: () => Navigator.pop(sheetContext, 'duplicate'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: Text(
+                l10n.deleteExpenseAction,
+                style: const TextStyle(color: Colors.red),
+              ),
+              onTap: () => Navigator.pop(sheetContext, 'delete'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!context.mounted || action == null) return;
+
+    switch (action) {
+      case 'edit':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AddEditExpenseScreen(tripId: tripId, existing: e),
+          ),
+        );
+      case 'duplicate':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AddEditExpenseScreen(
+              tripId: tripId,
+              existing: e,
+              duplicate: true,
+            ),
+          ),
+        );
+      case 'delete':
+        await _confirmDeleteExpense(context, ref, e);
+    }
+  }
+
+  Future<void> _confirmDeleteExpense(
+    BuildContext context,
+    WidgetRef ref,
+    Expense e,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.deleteExpenseDialogTitle),
+        content: Text(l10n.deleteExpenseDialogContent(e.title)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      await ref.read(expensesProvider(tripId).notifier).deleteExpense(e.id);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -474,6 +598,7 @@ class _ExpensesTab extends ConsumerWidget {
                     ),
                   );
                 },
+                onLongPress: () => _showExpenseActions(context, ref, e),
               ),
             );
           },

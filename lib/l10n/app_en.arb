@@ -169,6 +169,19 @@
       }
     }
   },
+  "qaAddExpense": "Add Expense",
+  "qaAddExpenseSubtitle": "Quick add to your active group",
+  "qaCreateGroup": "New Group",
+  "qaCreateGroupSubtitle": "Create a new group",
+  "qaLatestSummary": "Latest Summary",
+  "qaLatestSummarySubtitle": "Open the latest settlement summary",
+  "editExpenseAction": "Edit expense",
+  "duplicateExpenseAction": "Duplicate expense",
+  "deleteExpenseAction": "Delete expense",
+  "setAsHost": "Set as Host (Thủ quỹ)",
+  "hostAlready": "Already the Host",
+  "viewExpenseHistory": "View expense history",
+  "removeFromGroup": "Remove from group",
   "nameField": "Name",
   "contactOptional": "Contact (optional)",
   "contactHint": "Phone / email / handle",
@@ -295,6 +308,22 @@
     }
   },
   "netSettled": "Settled",
+  "widgetNetPay": "To pay: {amount}",
+  "@widgetNetPay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetNetReceive": "To receive: {amount}",
+  "@widgetNetReceive": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "noCategoryData": "No category data yet.",
   "billsParticipation": "{joined}/{total} bills",
   "@billsParticipation": {

@@ -248,6 +248,45 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get qaAddExpense => 'Thêm chi tiêu nhanh';
+
+  @override
+  String get qaAddExpenseSubtitle => 'Thêm chi tiêu vào nhóm đang hoạt động';
+
+  @override
+  String get qaCreateGroup => 'Tạo nhóm mới';
+
+  @override
+  String get qaCreateGroupSubtitle => 'Tạo một nhóm mới';
+
+  @override
+  String get qaLatestSummary => 'Xem quyết toán gần nhất';
+
+  @override
+  String get qaLatestSummarySubtitle => 'Mở bảng quyết toán của nhóm gần nhất';
+
+  @override
+  String get editExpenseAction => 'Chỉnh sửa khoản chi';
+
+  @override
+  String get duplicateExpenseAction => 'Nhân bản khoản chi';
+
+  @override
+  String get deleteExpenseAction => 'Xóa khoản chi';
+
+  @override
+  String get setAsHost => 'Chỉ định làm Thủ quỹ';
+
+  @override
+  String get hostAlready => 'Đã là Thủ quỹ';
+
+  @override
+  String get viewExpenseHistory => 'Xem lịch sử chi tiêu';
+
+  @override
+  String get removeFromGroup => 'Xóa khỏi nhóm';
+
+  @override
   String get nameField => 'Tên';
 
   @override
@@ -421,6 +460,16 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get netSettled => 'Đã cân bằng';
+
+  @override
+  String widgetNetPay(String amount) {
+    return 'Phải đóng: $amount';
+  }
+
+  @override
+  String widgetNetReceive(String amount) {
+    return 'Được nhận: $amount';
+  }
 
   @override
   String get noCategoryData => 'Chưa có dữ liệu danh mục.';

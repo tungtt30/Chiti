@@ -249,6 +249,45 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get qaAddExpense => 'Add Expense';
+
+  @override
+  String get qaAddExpenseSubtitle => 'Quick add to your active group';
+
+  @override
+  String get qaCreateGroup => 'New Group';
+
+  @override
+  String get qaCreateGroupSubtitle => 'Create a new group';
+
+  @override
+  String get qaLatestSummary => 'Latest Summary';
+
+  @override
+  String get qaLatestSummarySubtitle => 'Open the latest settlement summary';
+
+  @override
+  String get editExpenseAction => 'Edit expense';
+
+  @override
+  String get duplicateExpenseAction => 'Duplicate expense';
+
+  @override
+  String get deleteExpenseAction => 'Delete expense';
+
+  @override
+  String get setAsHost => 'Set as Host (Thủ quỹ)';
+
+  @override
+  String get hostAlready => 'Already the Host';
+
+  @override
+  String get viewExpenseHistory => 'View expense history';
+
+  @override
+  String get removeFromGroup => 'Remove from group';
+
+  @override
   String get nameField => 'Name';
 
   @override
@@ -422,6 +461,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get netSettled => 'Settled';
+
+  @override
+  String widgetNetPay(String amount) {
+    return 'To pay: $amount';
+  }
+
+  @override
+  String widgetNetReceive(String amount) {
+    return 'To receive: $amount';
+  }
 
   @override
   String get noCategoryData => 'No category data yet.';

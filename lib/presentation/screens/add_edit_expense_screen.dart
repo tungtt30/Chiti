@@ -17,8 +17,21 @@ import '../widgets/thousands_separator_input_formatter.dart';
 /// person pays the full amount. Pass [existing] to open in edit mode.
 class AddEditExpenseScreen extends ConsumerStatefulWidget {
   final String tripId;
+
+  /// Pass [existing] to open in edit mode.
   final Expense? existing;
-  const AddEditExpenseScreen({super.key, required this.tripId, this.existing});
+
+  /// When true, [existing] is used as a template: the form opens in create
+  /// mode (fresh expense) but prefilled with the existing expense's values
+  /// and participants (Nhân bản / duplicate).
+  final bool duplicate;
+
+  const AddEditExpenseScreen({
+    super.key,
+    required this.tripId,
+    this.existing,
+    this.duplicate = false,
+  });
 
   @override
   ConsumerState<AddEditExpenseScreen> createState() =>
@@ -43,7 +56,8 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
   Expense? get _existing => widget.existing;
 
-  bool get _isEdit => _existing != null;
+  /// Create-mode flag: a duplicate opens like a new expense but prefilled.
+  bool get _isEdit => _existing != null && !widget.duplicate;
 
   @override
   void initState() {
@@ -56,6 +70,8 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
       );
       _payerId = e.payerId;
       _category = e.category;
+      // Duplicates prefill the joined members too, then save as a new
+      // expense (edit mode skips this and loads from the DB).
       _loadExisting();
     }
   }
@@ -143,7 +159,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
         )
         .toList();
 
-    if (_existing == null) {
+    if (!_isEdit) {
       await ref
           .read(expensesProvider(widget.tripId).notifier)
           .createExpense(

@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/id_generator.dart';
+import '../core/services/recent_group_service.dart';
+import '../core/services/widget_service.dart';
 import '../core/settlement_calculator.dart';
 import '../data/models/models.dart';
 import '../data/repository.dart';
@@ -49,12 +51,17 @@ class TripListNotifier extends StateNotifier<AsyncValue<List<Trip>>> {
       endDate: endDate,
     );
     await load();
+    // A brand-new group becomes the quick-action target.
+    await RecentGroupService.saveRecentGroup(trip.id);
     return trip;
   }
 
   Future<void> deleteTrip(String id) async {
     await _repo.deleteTrip(id);
     await load();
+    // The home-screen widget tracked this group; reset it to the placeholder.
+    await clearWidgetData();
+    await RecentGroupService.clearRecentGroup();
   }
 }
 
@@ -100,6 +107,8 @@ class TripDetailNotifier extends StateNotifier<AsyncValue<Trip?>> {
     if (settlementChanged) {
       await ref.read(settlementsProvider(tripId).notifier).recalculate();
     }
+    // Name/currency/host edits change what the widget shows.
+    await refreshWidgetForTrip(ref, tripId);
   }
 }
 
@@ -157,6 +166,8 @@ class ParticipantsNotifier
           .updateTrip(trip.copyWith(hostId: participant.id));
     }
     await load();
+    // Membership changes shift balances shown on the home-screen widget.
+    await refreshWidgetForTrip(ref, tripId);
   }
 
   Future<void> updateParticipant(Participant participant) async {
@@ -177,6 +188,8 @@ class ParticipantsNotifier
           .read(tripDetailProvider(tripId).notifier)
           .updateTrip(trip.copyWith(hostId: nextHost, clearHost: nextHost == null));
     }
+    // Removing a member (possibly the host) changes the widget balance.
+    await refreshWidgetForTrip(ref, tripId);
   }
 }
 
@@ -229,6 +242,10 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
     // Recompute the who-owes-whom plan so balances reflect the new expense
     // immediately (matches update/delete behaviour).
     await ref.read(settlementsProvider(tripId).notifier).recalculate();
+    // The home-screen widget mirrors this group's totals & balance.
+    await refreshWidgetForTrip(ref, tripId);
+    // Expense edits make this the quick-action target group.
+    await RecentGroupService.saveRecentGroup(tripId);
   }
 
   Future<void> updateExpense({
@@ -242,6 +259,8 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
     await load();
     // Recompute the who-owes-whom plan so balances reflect the edit immediately.
     await ref.read(settlementsProvider(tripId).notifier).recalculate();
+    await refreshWidgetForTrip(ref, tripId);
+    await RecentGroupService.saveRecentGroup(tripId);
   }
 
   Future<void> deleteExpense(String id) async {
@@ -249,6 +268,8 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
     await load();
     // Recompute the who-owes-whom plan after removing the expense.
     await ref.read(settlementsProvider(tripId).notifier).recalculate();
+    await refreshWidgetForTrip(ref, tripId);
+    await RecentGroupService.saveRecentGroup(tripId);
   }
 }
 
@@ -384,6 +405,8 @@ class SettlementsNotifier extends StateNotifier<AsyncValue<List<Settlement>>> {
 
       await _repo.replaceSettlements(tripId, pledges);
       state = AsyncValue.data(await _repo.getSettlements(tripId));
+      // Toggling paid/unpaid changes the host's net shown on the widget.
+      await refreshWidgetForTrip(ref, tripId);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

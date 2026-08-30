@@ -10,7 +10,16 @@ import '../widgets/participant_edit_dialog.dart';
 
 class ManageParticipantsScreen extends ConsumerWidget {
   final String tripId;
-  const ManageParticipantsScreen({super.key, required this.tripId});
+
+  /// Called when a member long-press chooses "View expense history" (the
+  /// Summary tab of the parent trip screen).
+  final VoidCallback? onOpenSummary;
+
+  const ManageParticipantsScreen({
+    super.key,
+    required this.tripId,
+    this.onOpenSummary,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -144,6 +153,7 @@ class ManageParticipantsScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    onLongPress: () => _showMemberActions(context, ref, p),
                   ),
                 ),
             ],
@@ -151,6 +161,79 @@ class ManageParticipantsScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  /// Long-press action sheet for a member: set as Host, view expense
+  /// history (Summary tab), or remove from the group.
+  Future<void> _showMemberActions(
+    BuildContext context,
+    WidgetRef ref,
+    Participant p,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final trip = ref.read(tripDetailProvider(tripId)).valueOrNull;
+    final isHost = trip?.hostId == p.id;
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: ParticipantAvatar(participant: p, radius: 20),
+              title: Text(p.name),
+              subtitle: Text(
+                isHost ? l10n.hostBadge : l10n.memberNotePlaceholder,
+                style: Theme.of(sheetContext).textTheme.bodySmall,
+              ),
+            ),
+            const Divider(height: 1),
+            if (!isHost)
+              ListTile(
+                leading: const Icon(Icons.emoji_events_outlined),
+                title: Text(l10n.setAsHost),
+                onTap: () => Navigator.pop(sheetContext, 'host'),
+              ),
+            if (isHost)
+              ListTile(
+                enabled: false,
+                leading: const Icon(Icons.emoji_events),
+                title: Text(l10n.setAsHost),
+                subtitle: Text(l10n.hostAlready),
+              ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: Text(l10n.viewExpenseHistory),
+              onTap: () => Navigator.pop(sheetContext, 'history'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.remove_circle_outline, color: Colors.red),
+              title: Text(
+                l10n.removeFromGroup,
+                style: const TextStyle(color: Colors.red),
+              ),
+              onTap: () => Navigator.pop(sheetContext, 'remove'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!context.mounted || action == null) return;
+
+    switch (action) {
+      case 'host':
+        final current = ref.read(tripDetailProvider(tripId)).valueOrNull;
+        if (current != null) {
+          await ref
+              .read(tripDetailProvider(tripId).notifier)
+              .updateTrip(current.copyWith(hostId: p.id));
+        }
+      case 'history':
+        onOpenSummary?.call();
+      case 'remove':
+        await _confirmRemove(context, ref, p);
+    }
   }
 
   Future<void> _confirmRemove(

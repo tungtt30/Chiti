@@ -530,6 +530,84 @@ abstract class AppLocalizations {
   /// **'Remove {name} from this group?\nTheir shares and payers will be removed too.'**
   String removeParticipantContent(String name);
 
+  /// No description provided for @qaAddExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Expense'**
+  String get qaAddExpense;
+
+  /// No description provided for @qaAddExpenseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add to your active group'**
+  String get qaAddExpenseSubtitle;
+
+  /// No description provided for @qaCreateGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'New Group'**
+  String get qaCreateGroup;
+
+  /// No description provided for @qaCreateGroupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new group'**
+  String get qaCreateGroupSubtitle;
+
+  /// No description provided for @qaLatestSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest Summary'**
+  String get qaLatestSummary;
+
+  /// No description provided for @qaLatestSummarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the latest settlement summary'**
+  String get qaLatestSummarySubtitle;
+
+  /// No description provided for @editExpenseAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit expense'**
+  String get editExpenseAction;
+
+  /// No description provided for @duplicateExpenseAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate expense'**
+  String get duplicateExpenseAction;
+
+  /// No description provided for @deleteExpenseAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete expense'**
+  String get deleteExpenseAction;
+
+  /// No description provided for @setAsHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as Host (Thủ quỹ)'**
+  String get setAsHost;
+
+  /// No description provided for @hostAlready.
+  ///
+  /// In en, this message translates to:
+  /// **'Already the Host'**
+  String get hostAlready;
+
+  /// No description provided for @viewExpenseHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View expense history'**
+  String get viewExpenseHistory;
+
+  /// No description provided for @removeFromGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from group'**
+  String get removeFromGroup;
+
   /// No description provided for @nameField.
   ///
   /// In en, this message translates to:
@@ -835,6 +913,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settled'**
   String get netSettled;
+
+  /// No description provided for @widgetNetPay.
+  ///
+  /// In en, this message translates to:
+  /// **'To pay: {amount}'**
+  String widgetNetPay(String amount);
+
+  /// No description provided for @widgetNetReceive.
+  ///
+  /// In en, this message translates to:
+  /// **'To receive: {amount}'**
+  String widgetNetReceive(String amount);
 
   /// No description provided for @noCategoryData.
   ///

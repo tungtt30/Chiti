@@ -165,6 +165,19 @@
       }
     }
   },
+  "qaAddExpense": "Thêm chi tiêu nhanh",
+  "qaAddExpenseSubtitle": "Thêm chi tiêu vào nhóm đang hoạt động",
+  "qaCreateGroup": "Tạo nhóm mới",
+  "qaCreateGroupSubtitle": "Tạo một nhóm mới",
+  "qaLatestSummary": "Xem quyết toán gần nhất",
+  "qaLatestSummarySubtitle": "Mở bảng quyết toán của nhóm gần nhất",
+  "editExpenseAction": "Chỉnh sửa khoản chi",
+  "duplicateExpenseAction": "Nhân bản khoản chi",
+  "deleteExpenseAction": "Xóa khoản chi",
+  "setAsHost": "Chỉ định làm Thủ quỹ",
+  "hostAlready": "Đã là Thủ quỹ",
+  "viewExpenseHistory": "Xem lịch sử chi tiêu",
+  "removeFromGroup": "Xóa khỏi nhóm",
   "nameField": "Tên",
   "contactOptional": "Liên hệ (không bắt buộc)",
   "contactHint": "SĐT / email / handle",
@@ -291,6 +304,22 @@
     }
   },
   "netSettled": "Đã cân bằng",
+  "widgetNetPay": "Phải đóng: {amount}",
+  "@widgetNetPay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetNetReceive": "Được nhận: {amount}",
+  "@widgetNetReceive": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "noCategoryData": "Chưa có dữ liệu danh mục.",
   "billsParticipation": "{joined}/{total} khoản",
   "@billsParticipation": {
