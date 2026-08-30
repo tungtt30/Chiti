@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,11 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants.dart';
 import '../../core/formatters.dart';
 import '../../core/trip_report_text.dart';
+import '../../core/utils/image_exporter.dart';
 import '../../data/models/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/providers.dart';
 import '../../providers/trip_summary_provider.dart';
+import '../widgets/expenses/expense_report_view.dart';
 import '../widgets/participant_edit_dialog.dart';
+import '../widgets/summary/summary_report_view.dart';
 import '../widgets/summary/summary_screen.dart';
 import 'add_edit_expense_screen.dart';
 import 'add_trip_screen.dart';
@@ -103,6 +108,167 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
     );
   }
 
+  /// Builds the off-screen report Column for the current tab.
+  Future<Widget> _buildReportWidget(Trip trip) async {
+    final participants =
+        ref.read(participantsProvider(_tripId)).valueOrNull ?? [];
+    if (_currentTab == 0) {
+      final expenses =
+          ref.read(expensesProvider(_tripId)).valueOrNull ?? const [];
+      final joined = await ref.read(
+        expenseParticipantsForTripProvider(_tripId).future,
+      );
+      final joinedCount = <String, int>{};
+      for (final member in joined) {
+        joinedCount[member.expenseId] =
+            (joinedCount[member.expenseId] ?? 0) + 1;
+      }
+      return ExpenseReportView(
+        trip: trip,
+        expenses: expenses,
+        participants: participants,
+        joinedCount: joinedCount,
+      );
+    }
+    final stats = await ref.read(tripSummaryProvider(_tripId).future);
+    return SummaryReportView(
+      trip: trip,
+      stats: stats,
+      participants: participants,
+      hostId: trip.hostId,
+    );
+  }
+
+  /// "Export as long image" (Chụp ảnh bảng kê) for the current tab.
+  Future<void> _captureCurrentTab() async {
+    HapticFeedback.lightImpact();
+    final l10n = AppLocalizations.of(context)!;
+    final trip = ref.read(tripDetailProvider(_tripId)).valueOrNull;
+    if (trip == null || !mounted) return;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final report = await _buildReportWidget(trip);
+      if (!mounted) return;
+      final bytes = await ImageExporter.captureLongReport(
+        report: report,
+        context: context,
+      );
+      final file = await ImageExporter.writePng(bytes);
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // close the spinner
+      await _showReportPreview(
+        bytes: bytes,
+        file: file,
+        trip: trip,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop(); // close the spinner
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.captureFailed(e.toString()))),
+      );
+    }
+  }
+
+  Future<void> _showReportPreview({
+    required Uint8List bytes,
+    required File file,
+    required Trip trip,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Row(
+                children: [
+                  Text(
+                    l10n.reportPreviewTitle,
+                    style: Theme.of(dialogContext).textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 320),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(dialogContext).colorScheme.outlineVariant,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SingleChildScrollView(
+                  child: Image.memory(bytes, fit: BoxFit.contain),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () async {
+                      Navigator.of(dialogContext).pop();
+                      await ImageExporter.sharePng(
+                        file,
+                        text: l10n.shareReportText(trip.name),
+                      );
+                    },
+                    icon: const Icon(Icons.share, size: 18),
+                    label: Text(l10n.shareAction),
+                  ),
+                  TextButton.icon(
+                    onPressed: () async {
+                      try {
+                        await ImageExporter.saveToGallery(file);
+                        if (!dialogContext.mounted) return;
+                        Navigator.of(dialogContext).pop();
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.savedToGallery)),
+                        );
+                      } catch (e) {
+                        if (!dialogContext.mounted) return;
+                        ScaffoldMessenger.of(dialogContext).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.captureFailed(e.toString())),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.photo_library_outlined, size: 18),
+                    label: Text(l10n.saveToGallery),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: Text(l10n.cancel),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget? _buildFabForCurrentTab() {
     final l10n = AppLocalizations.of(context)!;
     return switch (_currentTab) {
@@ -163,6 +329,12 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
               ],
             ),
             actions: [
+              if (_currentTab == 0 || _currentTab == 2)
+                IconButton(
+                  icon: const Icon(Icons.photo_camera_outlined),
+                  tooltip: l10n.captureReport,
+                  onPressed: _captureCurrentTab,
+                ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
                 tooltip: l10n.editTrip,
@@ -251,6 +423,8 @@ class _ExpensesTab extends ConsumerWidget {
         }
 
         return ListView.builder(
+          primary: false,
+          semanticChildCount: expenses.length,
           padding: const EdgeInsets.only(bottom: 88),
           itemCount: expenses.length,
           itemBuilder: (context, index) {

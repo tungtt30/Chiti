@@ -352,6 +352,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportCopied => 'Trip report copied';
 
   @override
+  String get captureReport => 'Capture full report as image';
+
+  @override
+  String get reportPreviewTitle => 'Report preview';
+
+  @override
+  String get shareAction => 'Share';
+
+  @override
+  String get saveToGallery => 'Save to gallery';
+
+  @override
+  String get savedToGallery => 'Saved to gallery';
+
+  @override
+  String captureFailed(String error) {
+    return 'Could not generate image: $error';
+  }
+
+  @override
+  String get reportGeneratedFooter => 'Made with Chiti';
+
+  @override
+  String shareReportText(String tripName) {
+    return 'Expense report for $tripName';
+  }
+
+  @override
   String get statsEmptyTitle => 'No expenses yet';
 
   @override

@@ -51,6 +51,8 @@ class ManageParticipantsScreen extends ConsumerWidget {
           }
 
           return ListView(
+            primary: false,
+            semanticChildCount: participants.length,
             padding: const EdgeInsets.only(bottom: 88),
             children: [
               if (trip != null)

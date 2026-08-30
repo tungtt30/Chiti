@@ -242,6 +242,28 @@
   "copyTripReport": "Sao chép báo cáo chuyến đi",
   "shareSummary": "Chia sẻ tổng kết",
   "reportCopied": "Đã sao chép báo cáo chuyến đi",
+  "captureReport": "Chụp ảnh bảng kê",
+  "reportPreviewTitle": "Xem trước ảnh",
+  "shareAction": "Chia sẻ",
+  "saveToGallery": "Lưu vào thư viện",
+  "savedToGallery": "Đã lưu vào thư viện",
+  "captureFailed": "Không thể tạo ảnh: {error}",
+  "@captureFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportGeneratedFooter": "Tạo bởi Chiti",
+  "shareReportText": "Báo cáo chi tiêu chuyến đi {tripName}",
+  "@shareReportText": {
+    "placeholders": {
+      "tripName": {
+        "type": "String"
+      }
+    }
+  },
   "statsEmptyTitle": "Chưa có khoản chi nào",
   "statsEmptyHint": "Thêm chi tiêu để xem bảng thống kê và kế hoạch thanh toán.",
   "kpiTotalSpent": "Tổng chi tiêu chuyến đi",

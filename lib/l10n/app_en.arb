@@ -246,6 +246,28 @@
   "copyTripReport": "Copy trip report",
   "shareSummary": "Share Summary",
   "reportCopied": "Trip report copied",
+  "captureReport": "Capture full report as image",
+  "reportPreviewTitle": "Report preview",
+  "shareAction": "Share",
+  "saveToGallery": "Save to gallery",
+  "savedToGallery": "Saved to gallery",
+  "captureFailed": "Could not generate image: {error}",
+  "@captureFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportGeneratedFooter": "Made with Chiti",
+  "shareReportText": "Expense report for {tripName}",
+  "@shareReportText": {
+    "placeholders": {
+      "tripName": {
+        "type": "String"
+      }
+    }
+  },
   "statsEmptyTitle": "No expenses yet",
   "statsEmptyHint": "Add expenses to see statistics and the payment plan.",
   "kpiTotalSpent": "Total spent",

@@ -112,6 +112,7 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
+          primary: false,
           padding: const EdgeInsets.all(16),
           children: [
             TextFormField(

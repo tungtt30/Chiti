@@ -710,6 +710,54 @@ abstract class AppLocalizations {
   /// **'Trip report copied'**
   String get reportCopied;
 
+  /// No description provided for @captureReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture full report as image'**
+  String get captureReport;
+
+  /// No description provided for @reportPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report preview'**
+  String get reportPreviewTitle;
+
+  /// No description provided for @shareAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareAction;
+
+  /// No description provided for @saveToGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to gallery'**
+  String get saveToGallery;
+
+  /// No description provided for @savedToGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to gallery'**
+  String get savedToGallery;
+
+  /// No description provided for @captureFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not generate image: {error}'**
+  String captureFailed(String error);
+
+  /// No description provided for @reportGeneratedFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Made with Chiti'**
+  String get reportGeneratedFooter;
+
+  /// No description provided for @shareReportText.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense report for {tripName}'**
+  String shareReportText(String tripName);
+
   /// No description provided for @statsEmptyTitle.
   ///
   /// In en, this message translates to:

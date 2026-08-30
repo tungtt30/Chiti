@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Only needed on API <= 28; on Android 10+ gal writes via MediaStore. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
     <application
         android:label="chiti"
         android:name="${applicationName}"

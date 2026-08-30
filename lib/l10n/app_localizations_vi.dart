@@ -352,6 +352,34 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportCopied => 'Đã sao chép báo cáo chuyến đi';
 
   @override
+  String get captureReport => 'Chụp ảnh bảng kê';
+
+  @override
+  String get reportPreviewTitle => 'Xem trước ảnh';
+
+  @override
+  String get shareAction => 'Chia sẻ';
+
+  @override
+  String get saveToGallery => 'Lưu vào thư viện';
+
+  @override
+  String get savedToGallery => 'Đã lưu vào thư viện';
+
+  @override
+  String captureFailed(String error) {
+    return 'Không thể tạo ảnh: $error';
+  }
+
+  @override
+  String get reportGeneratedFooter => 'Tạo bởi Chiti';
+
+  @override
+  String shareReportText(String tripName) {
+    return 'Báo cáo chi tiêu chuyến đi $tripName';
+  }
+
+  @override
   String get statsEmptyTitle => 'Chưa có khoản chi nào';
 
   @override

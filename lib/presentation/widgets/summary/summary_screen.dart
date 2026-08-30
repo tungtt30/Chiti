@@ -43,6 +43,7 @@ class SummaryScreen extends ConsumerWidget {
           return _EmptyState(l10n: l10n);
         }
         return ListView(
+          primary: false,
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 88),
           children: [
             // ---------------- Section A: KPI ----------------

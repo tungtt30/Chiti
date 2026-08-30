@@ -17,6 +17,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle), centerTitle: true),
       body: ListView(
+        primary: false,
         padding: const EdgeInsets.all(16),
         children: [
           Text(

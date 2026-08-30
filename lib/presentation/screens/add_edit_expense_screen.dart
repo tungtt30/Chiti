@@ -254,6 +254,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
             child: Form(
               key: _formKey,
               child: ListView(
+                primary: false,
                 padding: const EdgeInsets.all(16),
                 children: [
                   TextFormField(

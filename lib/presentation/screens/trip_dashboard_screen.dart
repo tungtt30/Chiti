@@ -66,6 +66,8 @@ class TripDashboardScreen extends ConsumerWidget {
             );
           }
           return ListView.builder(
+            primary: false,
+            semanticChildCount: trips.length,
             padding: const EdgeInsets.all(8),
             itemCount: trips.length,
             itemBuilder: (context, index) => _TripCard(trip: trips[index]),
