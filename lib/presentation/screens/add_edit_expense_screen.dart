@@ -9,6 +9,7 @@ import '../../data/models/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/providers.dart';
 import '../widgets/participant_chips.dart';
+import '../widgets/thousands_separator_input_formatter.dart';
 
 /// Create-or-edit expense form for a trip.
 ///
@@ -50,7 +51,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
     final e = _existing;
     if (e != null) {
       _titleCtrl.text = e.title;
-      _amountCtrl.text = _displayAmount(e.amount);
+      _amountCtrl.text = ThousandsSeparatorInputFormatter.formatThousands(
+        _displayAmount(e.amount),
+      );
       _payerId = e.payerId;
       _category = e.category;
       _loadExisting();
@@ -92,7 +95,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
   void _onAmountChanged() => setState(() {});
 
-  double? _total() => double.tryParse(_amountCtrl.text);
+  /// Parses the (possibly comma-grouped) amount field. Commas are stripped
+  /// before numeric parsing.
+  double? _total() => double.tryParse(_amountCtrl.text.replaceAll(',', ''));
 
   String _displayAmount(double value) {
     if (value == 0) return '0';
@@ -272,6 +277,9 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                   TextFormField(
                     controller: _amountCtrl,
                     onChanged: (_) => _onAmountChanged(),
+                    inputFormatters: const [
+                      ThousandsSeparatorInputFormatter(),
+                    ],
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
@@ -282,7 +290,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return l10n.required;
-                      final n = double.tryParse(v);
+                      final n = double.tryParse(v.replaceAll(',', ''));
                       if (n == null || n <= 0) return l10n.amountMustBePositive;
                       return null;
                     },

@@ -114,7 +114,8 @@ class _TripCard extends ConsumerWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          '${trip.destination} · ${formatDate(trip.startDate, locale)}'
+          '${trip.destination.isNotEmpty ? '${trip.destination} · ' : ''}'
+          '${formatDate(trip.startDate, locale)}'
           '${_isSameDay(trip.startDate, trip.endDate) ? '' : ' – ${formatDate(trip.endDate, locale)}'}',
         ),
         trailing: totalAsync.when(

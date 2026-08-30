@@ -43,12 +43,13 @@ class ExpenseReportView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          '📍 ${trip.destination}',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+        if (trip.destination.isNotEmpty)
+          Text(
+            '📍 ${trip.destination}',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
         const SizedBox(height: 12),
         Row(
           children: [

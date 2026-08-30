@@ -19,7 +19,7 @@ class Trip {
   const Trip({
     required this.id,
     required this.name,
-    required this.destination,
+    this.destination = '',
     required this.currency,
     required this.startDate,
     required this.endDate,

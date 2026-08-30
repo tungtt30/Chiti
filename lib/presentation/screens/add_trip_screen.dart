@@ -30,7 +30,7 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
     super.initState();
     _nameCtrl = TextEditingController(text: _existing?.name ?? '');
     _destCtrl = TextEditingController(text: _existing?.destination ?? '');
-    _currency = _existing?.currency ?? 'USD';
+    _currency = _existing?.currency ?? 'VND';
     _startDate = _existing?.startDate ?? DateTime.now();
     _endDate = _existing?.endDate ?? _startDate;
   }
@@ -133,8 +133,6 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.place),
               ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(

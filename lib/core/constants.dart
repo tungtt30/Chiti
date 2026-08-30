@@ -90,13 +90,13 @@ class SplitMode {
   static const all = [equal, customAmount, customWeight];
 }
 
-/// Currencies offered when creating a trip.
+/// Currencies offered when creating a group. VND is the default.
 const kSupportedCurrencies = [
+  'VND',
   'USD',
   'EUR',
   'GBP',
   'JPY',
-  'VND',
   'THB',
   'KRW',
   'CNY',
