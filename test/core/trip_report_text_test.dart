@@ -17,14 +17,14 @@ void main() {
     ),
     categories: const [
       CategoryStat(
-        categoryId: 'Food',
-        label: 'Ăn uống',
-        emoji: '🍽️',
+        categoryId: 'dining',
+        label: 'Ăn uống & Tiệc tùng',
+        emoji: '🍜',
         total: 100,
         percent: 0.27777777777,
       ),
       CategoryStat(
-        categoryId: 'Transport',
+        categoryId: 'transport',
         label: 'Di chuyển',
         emoji: '🚗',
         total: 260,
@@ -77,7 +77,7 @@ void main() {
       nameMap: const {'a': 'Alice', 'b': 'Bob'},
     );
 
-    expect(text, contains('BÁO CÁO CHUYẾN ĐI "Phố Cổ"'));
+    expect(text, contains('BÁO CÁO NHÓM "Phố Cổ"'));
     expect(text, contains('Alice'));
     expect(text, contains('Bob'));
     expect(text, contains('Ăn uống'));

@@ -43,7 +43,7 @@ Expense _expense() => Expense(
   title: 'Dinner',
   amount: 300000,
   payerId: 'p1',
-  category: 'Food',
+  category: 'dining',
   createdAt: DateTime(2026, 8, 2),
 );
 
@@ -60,9 +60,9 @@ TripSummaryStats _stats() {
     ),
     categories: const [
       CategoryStat(
-        categoryId: 'Food',
-        label: 'Food',
-        emoji: '🍽️',
+        categoryId: 'dining',
+        label: 'Dining & Drinks',
+        emoji: '🍜',
         total: 300000,
         percent: 1.0,
       ),

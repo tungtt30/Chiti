@@ -1,28 +1,32 @@
-# Chiti — Travel Expense Tracker & Bill Splitter
+# Chiti — Group Expense & Bill Splitter
 
-Offline-first Flutter app for tracking shared expenses during a trip and
-settling balances among participants. Data lives on-device in SQLite, so it
-works fully offline. **Android & iOS only** (desktop/web out of scope).
+Offline-first Flutter app for tracking shared expenses within any group —
+sports clubs (badminton, football), dining out, roommate living costs,
+hangouts, and trips — and settling balances among members. Data lives
+on-device in SQLite, so it works fully offline. **Android & iOS only**
+(desktop/web out of scope).
 
 ## Features
 
-- **Trips** — create/edit/delete trips with name, destination, currency
-  (VND, USD, …), and a start/end date range.
+- **Groups** — create/edit/delete groups (trips, clubs, roommates, …) with
+  name, location, currency (VND, USD, …), and a start/end date range.
 - **Members & Notes** — add/edit/remove participants with avatar color, contact
-  info, and a per-person note for the trip (e.g. *"Paid deposit early"*,
+  info, and a per-person note for the group (e.g. *"Paid deposit early"*,
   *"Vegetarian discount"*).
-- **Expenses** — title, date, category (Food / Transport / Lodging / Activities /
-  Other), **single or multiple payers** with the exact amount each paid, and
-  flexible splitting:
+- **Expenses** — title, date, category (Sports / Dining / Cafe / Transport /
+  Housing / Entertainment / Shopping / Other), **single or multiple payers**
+  with the exact amount each paid, and flexible splitting:
   - **Shared expense toggle** — split equally among all active members.
   - **Split Equally** button — instant equal division for the selected people.
   - **Custom Amounts** — exact amount per participant.
   - **Weights** — weighted shares (e.g. 2x for two nights).
   - Per-person inline notes on each portion (e.g. *"Owes flight ticket
     separately"*).
-- **Summary dashboard** — 4-column table (Participant | Spent | Share | Net),
-  color-coded settlement plan with **Paid/Completed** checkboxes, and a
-  **Calculate / Re-balance** button that persists the new plan.
+- **Summary dashboard** — member audit (Paid / Owes / Net), color-coded
+  settlement plan (Host/Thủ quỹ or peer-to-peer) with **Paid/Completed**
+  checkboxes, and a **Recalculate** button that persists the new plan.
+- **Long-image export** — capture the full summary or expense list as a PNG
+  and share or save to gallery.
 
 ## Architecture
 
@@ -94,15 +98,16 @@ flutter test                     # runs unit + widget tests
 ### Data & migrations
 
 Database: `chiti.db` in the app documents directory. Foreign keys are enforced
-via `PRAGMA foreign_keys = ON`; deleting a trip/participant cascades to its
-expenses, splits, payers, and settlements. Current schema version is `2`;
-`onUpgrade` recreates the dev database from older versions.
+via `PRAGMA foreign_keys = ON`; deleting a group/participant cascades to its
+expenses, splits, payers, and settlements. Current schema version is `6`
+(migrations: v4 adds `expenses.category`, v5 adds `host_id`/`settlement_mode`
+to `trips`, v6 remaps legacy category ids onto the current preset set).
 
 ## Package manifest (`pubspec.yaml`)
 
 ```yaml
 name: chiti
-description: "An offline-first Travel Expense Splitting app."
+description: "Group expense & bill splitting app for trips, sports clubs, dining, roommates and hangouts."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -119,6 +124,8 @@ dependencies:
   path_provider: ^2.1.5
   intl: ^0.20.2             # currency & date formatting
   uuid: ^4.5.1              # user ids
+  share_plus: ^10.0.0       # share captured report images
+  gal: ^2.3.0               # save captured report images to gallery
 
 dev_dependencies:
   flutter_test:

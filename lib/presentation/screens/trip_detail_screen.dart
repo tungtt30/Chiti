@@ -104,7 +104,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.reportCopied)),
+      SnackBar(content: Text(l10n.groupReportCopied)),
     );
   }
 
@@ -306,7 +306,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
           Scaffold(body: Center(child: Text(l10n.errorLabel(e.toString())))),
       data: (trip) {
         if (trip == null) {
-          return Scaffold(body: Center(child: Text(l10n.tripNotFound)));
+          return Scaffold(body: Center(child: Text(l10n.groupNotFound)));
         }
         return Scaffold(
           appBar: AppBar(
@@ -337,7 +337,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
                 ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
-                tooltip: l10n.editTrip,
+                tooltip: l10n.editGroup,
                 onPressed: () {
                   Navigator.push(
                     context,

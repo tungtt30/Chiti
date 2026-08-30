@@ -127,7 +127,7 @@ class SummaryReportView extends StatelessWidget {
   }
 }
 
-/// Report title block: emoji, trip name, destination & dates, host chip.
+/// Report title block: emoji, group name, location & dates, host chip.
 class _ReportHeader extends StatelessWidget {
   final Trip trip;
   final String? hostName;

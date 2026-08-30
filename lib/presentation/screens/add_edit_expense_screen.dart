@@ -31,7 +31,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
   final Set<String> _selectedIds = {};
   String _payerId = '';
-  String _category = ExpenseCategory.others;
+  String _category = ExpenseCategory.other;
 
   /// True while prefilled data is being loaded in edit mode; gates the lazy
   /// self-seed branch in build() so it cannot overwrite the loaded values.

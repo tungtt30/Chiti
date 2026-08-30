@@ -29,15 +29,15 @@
   "englishLanguage": "English",
   "vietnameseLanguage": "Tiếng Việt",
 
-  "myTrips": "My Trips",
-  "noTripsYet": "No trips yet",
-  "noTripsHint": "Tap + to create your first trip",
-  "newTrip": "New Trip",
-  "deleteTripTitle": "Delete trip?",
-  "deleteTripContent": "Remove \"{tripName}\" and all its expenses?",
-  "@deleteTripContent": {
+  "myGroups": "My Groups",
+  "noGroupsYet": "No groups yet",
+  "noGroupsHint": "Tap + to create your first group",
+  "newGroup": "New Group",
+  "deleteGroupTitle": "Delete group?",
+  "deleteGroupContent": "Remove \"{groupName}\" and all its expenses?",
+  "@deleteGroupContent": {
     "placeholders": {
-      "tripName": {
+      "groupName": {
         "type": "String"
       }
     }
@@ -46,8 +46,8 @@
   "tabExpenses": "Expenses",
   "tabMembersAndNotes": "Members & Notes",
   "tabSummary": "Summary",
-  "editTrip": "Edit Trip",
-  "tripNotFound": "Trip not found",
+  "editGroup": "Edit Group",
+  "groupNotFound": "Group not found",
   "noExpensesYet": "No expenses yet",
   "noExpensesHint": "Tap + to add an expense",
   "expenseSubtitle": "Paid by {paidBy} · {joined} of {total} joined",
@@ -65,9 +65,9 @@
     }
   },
 
-  "createTrip": "Create Trip",
-  "tripName": "Trip Name",
-  "destination": "Destination",
+  "createGroup": "Create Group",
+  "groupName": "Group Name",
+  "location": "Location",
   "currency": "Currency",
   "startDate": "Start Date",
   "endDate": "End Date",
@@ -86,7 +86,7 @@
     }
   },
   "expenseTitle": "Title",
-  "expenseTitleHint": "Dinner at Beach, Grab to Hotel…",
+  "expenseTitleHint": "Dinner, badminton court, rent, Grab…",
   "amount": "Amount",
   "amountMustBePositive": "Must be > 0",
   "category": "Category",
@@ -161,7 +161,7 @@
   "editAction": "Edit",
   "removeAction": "Remove",
   "removeParticipantTitle": "Remove participant?",
-  "removeParticipantContent": "Remove {name} from this trip?\nTheir shares and payers will be removed too.",
+  "removeParticipantContent": "Remove {name} from this group?\nTheir shares and payers will be removed too.",
   "@removeParticipantContent": {
     "placeholders": {
       "name": {
@@ -172,7 +172,7 @@
   "nameField": "Name",
   "contactOptional": "Contact (optional)",
   "contactHint": "Phone / email / handle",
-  "noteForTripOptional": "Note for this trip (optional)",
+  "noteForGroupOptional": "Note for this group (optional)",
   "noteHint": "e.g. Paid deposit early, vegetarian discount…",
   "avatarColor": "Avatar color",
 
@@ -243,9 +243,9 @@
       }
     }
   },
-  "copyTripReport": "Copy trip report",
+  "copyGroupReport": "Copy group report",
   "shareSummary": "Share Summary",
-  "reportCopied": "Trip report copied",
+  "groupReportCopied": "Group report copied",
   "captureReport": "Capture full report as image",
   "reportPreviewTitle": "Report preview",
   "shareAction": "Share",
@@ -260,10 +260,10 @@
     }
   },
   "reportGeneratedFooter": "Made with Chiti",
-  "shareReportText": "Expense report for {tripName}",
+  "shareReportText": "Group expense report for {groupName}",
   "@shareReportText": {
     "placeholders": {
-      "tripName": {
+      "groupName": {
         "type": "String"
       }
     }
@@ -326,10 +326,10 @@
   "copyText": "Copy",
   "copiedToClipboard": "Copied to clipboard",
 
-  "reportTitle": "TRIP REPORT \"{tripName}\"",
+  "reportTitle": "GROUP REPORT \"{groupName}\"",
   "@reportTitle": {
     "placeholders": {
-      "tripName": {
+      "groupName": {
         "type": "String"
       }
     }
@@ -449,9 +449,12 @@
     }
   },
 
-  "categoryFood": "Food",
+  "categorySports": "Sports & Court",
+  "categoryDining": "Dining & Drinks",
+  "categoryCafe": "Coffee & Hangouts",
   "categoryTransport": "Transport",
-  "categoryLodging": "Lodging",
-  "categoryActivities": "Activities",
+  "categoryHousing": "Housing & Utilities",
+  "categoryEntertainment": "Entertainment",
+  "categoryShopping": "Shared Shopping",
   "categoryOther": "Other"
 }

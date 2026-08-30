@@ -104,7 +104,7 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? l10n.editTrip : l10n.createTrip),
+        title: Text(isEdit ? l10n.editGroup : l10n.createGroup),
         actions: [
           TextButton(onPressed: _save, child: Text(l10n.save)),
         ],
@@ -118,7 +118,7 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
             TextFormField(
               controller: _nameCtrl,
               decoration: InputDecoration(
-                labelText: l10n.tripName,
+                labelText: l10n.groupName,
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.flight),
               ),
@@ -129,7 +129,7 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
             TextFormField(
               controller: _destCtrl,
               decoration: InputDecoration(
-                labelText: l10n.destination,
+                labelText: l10n.location,
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.place),
               ),
@@ -169,7 +169,7 @@ class _AddTripScreenState extends ConsumerState<AddTripScreen> {
             FilledButton.icon(
               onPressed: _save,
               icon: const Icon(Icons.check),
-              label: Text(isEdit ? l10n.saveChanges : l10n.createTrip),
+              label: Text(isEdit ? l10n.saveChanges : l10n.createGroup),
             ),
           ],
         ),

@@ -153,7 +153,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('fab_summary')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Trip report copied'), findsOneWidget);
+    expect(find.text('Group report copied'), findsOneWidget);
   });
 
   testWidgets('tab switching animates exactly one FAB at a time',

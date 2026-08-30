@@ -1,45 +1,84 @@
 import '../l10n/app_localizations.dart';
 
 class ExpenseCategory {
-  static const food = 'Food';
-  static const transport = 'Transport';
-  static const lodging = 'Lodging';
-  static const activities = 'Activities';
-  static const others = 'Other';
+  static const sports = 'sports'; // 🏸 Thể thao & Sân bãi
+  static const dining = 'dining'; // 🍜 Ăn uống & Tiệc tùng
+  static const cafe = 'cafe'; // ☕ Cafe & Trà đá
+  static const transport = 'transport'; // 🚗 Di chuyển
+  static const housing = 'housing'; // 🏠 Sinh hoạt & Tiền phòng
+  static const entertainment = 'entertainment'; // 🎟️ Vui chơi & Giải trí
+  static const shopping = 'shopping'; // 🛍️ Mua sắm chung
+  static const other = 'other'; // 📦 Khác
 
-  static const all = [food, transport, lodging, activities, others];
+  static const all = [
+    sports,
+    dining,
+    cafe,
+    transport,
+    housing,
+    entertainment,
+    shopping,
+    other,
+  ];
 
   static const icons = {
-    food: '🍽️',
+    sports: '🏸',
+    dining: '🍜',
+    cafe: '☕',
     transport: '🚗',
-    lodging: '🏨',
-    activities: '🎭',
-    others: '📦',
+    housing: '🏠',
+    entertainment: '🎟️',
+    shopping: '🛍️',
+    other: '📦',
+  };
+
+  /// Category ids persisted before the multi-purpose overhaul (trip-era
+  /// presets). Used to map legacy rows onto the current set.
+  static const legacyAliases = {
+    'Food': dining,
+    'Transport': transport,
+    'Lodging': housing,
+    'Activities': entertainment,
+    'Other': other,
   };
 
   /// Fallback English labels (used by pure Dart code outside the widget tree).
   static const labels = {
-    food: 'Food',
+    sports: 'Sports & Court',
+    dining: 'Dining & Drinks',
+    cafe: 'Coffee & Hangouts',
     transport: 'Transport',
-    lodging: 'Lodging',
-    activities: 'Activities',
-    others: 'Other',
+    housing: 'Housing & Utilities',
+    entertainment: 'Entertainment',
+    shopping: 'Shared Shopping',
+    other: 'Other',
   };
 
   static String label(String category) => labels[category] ?? 'Other';
 
+  /// Maps a stored category id onto the current set: legacy ids are aliased,
+  /// anything unknown falls back to [other] so stale/foreign rows never break
+  /// the dashboard.
+  static String normalize(String category) {
+    if (all.contains(category)) return category;
+    return legacyAliases[category] ?? other;
+  }
+
   /// Locale-aware label for UI strings.
   static String localizedLabel(String category, AppLocalizations l10n) {
     return switch (category) {
-      food => l10n.categoryFood,
+      sports => l10n.categorySports,
+      dining => l10n.categoryDining,
+      cafe => l10n.categoryCafe,
       transport => l10n.categoryTransport,
-      lodging => l10n.categoryLodging,
-      activities => l10n.categoryActivities,
+      housing => l10n.categoryHousing,
+      entertainment => l10n.categoryEntertainment,
+      shopping => l10n.categoryShopping,
       _ => l10n.categoryOther,
     };
   }
 
-  static const fallback = others;
+  static const fallback = other;
 }
 
 /// How the total of an expense is divided among participants.

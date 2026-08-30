@@ -25,15 +25,15 @@
   "englishLanguage": "English",
   "vietnameseLanguage": "Tiếng Việt",
 
-  "myTrips": "Chuyến đi của tôi",
-  "noTripsYet": "Chưa có chuyến đi nào",
-  "noTripsHint": "Nhấn + để tạo chuyến đi đầu tiên",
-  "newTrip": "Chuyến đi mới",
-  "deleteTripTitle": "Xóa chuyến đi?",
-  "deleteTripContent": "Xóa \"{tripName}\" và toàn bộ chi phí của chuyến đi?",
-  "@deleteTripContent": {
+  "myGroups": "Nhóm của tôi",
+  "noGroupsYet": "Chưa có nhóm nào",
+  "noGroupsHint": "Nhấn + để tạo nhóm đầu tiên",
+  "newGroup": "Nhóm mới",
+  "deleteGroupTitle": "Xóa nhóm?",
+  "deleteGroupContent": "Xóa \"{groupName}\" và toàn bộ chi phí của nhóm?",
+  "@deleteGroupContent": {
     "placeholders": {
-      "tripName": {
+      "groupName": {
         "type": "String"
       }
     }
@@ -42,8 +42,8 @@
   "tabExpenses": "Khoản chi",
   "tabMembersAndNotes": "Thành viên & Ghi chú",
   "tabSummary": "Tổng kết",
-  "editTrip": "Sửa chuyến đi",
-  "tripNotFound": "Không tìm thấy chuyến đi",
+  "editGroup": "Sửa nhóm",
+  "groupNotFound": "Không tìm thấy nhóm",
   "noExpensesYet": "Chưa có khoản chi nào",
   "noExpensesHint": "Nhấn + để thêm khoản chi",
   "expenseSubtitle": "{paidBy} đã trả · {joined}/{total} người tham gia",
@@ -61,9 +61,9 @@
     }
   },
 
-  "createTrip": "Tạo chuyến đi",
-  "tripName": "Tên chuyến đi",
-  "destination": "Điểm đến",
+  "createGroup": "Tạo nhóm",
+  "groupName": "Tên nhóm",
+  "location": "Địa điểm",
   "currency": "Tiền tệ",
   "startDate": "Ngày bắt đầu",
   "endDate": "Ngày kết thúc",
@@ -82,7 +82,7 @@
     }
   },
   "expenseTitle": "Tiêu đề",
-  "expenseTitleHint": "Ăn tối ở Biển, Grab về khách sạn…",
+  "expenseTitleHint": "Ăn tối, thuê sân cầu lông, tiền nhà, Grab…",
   "amount": "Số tiền",
   "amountMustBePositive": "Phải lớn hơn 0",
   "category": "Danh mục",
@@ -157,7 +157,7 @@
   "editAction": "Sửa",
   "removeAction": "Xóa",
   "removeParticipantTitle": "Xóa thành viên?",
-  "removeParticipantContent": "Xóa {name} khỏi chuyến này?\nPhần chia và khoản chi của họ cũng sẽ bị xóa.",
+  "removeParticipantContent": "Xóa {name} khỏi nhóm này?\nPhần chia và khoản chi của họ cũng sẽ bị xóa.",
   "@removeParticipantContent": {
     "placeholders": {
       "name": {
@@ -168,7 +168,7 @@
   "nameField": "Tên",
   "contactOptional": "Liên hệ (không bắt buộc)",
   "contactHint": "SĐT / email / handle",
-  "noteForTripOptional": "Ghi chú cho chuyến đi này (không bắt buộc)",
+  "noteForGroupOptional": "Ghi chú cho nhóm này (không bắt buộc)",
   "noteHint": "VD: Đặt cọc sớm, giảm giá chay…",
   "avatarColor": "Màu hình đại diện",
 
@@ -239,9 +239,9 @@
       }
     }
   },
-  "copyTripReport": "Sao chép báo cáo chuyến đi",
+  "copyGroupReport": "Sao chép báo cáo nhóm",
   "shareSummary": "Chia sẻ tổng kết",
-  "reportCopied": "Đã sao chép báo cáo chuyến đi",
+  "groupReportCopied": "Đã sao chép báo cáo nhóm",
   "captureReport": "Chụp ảnh bảng kê",
   "reportPreviewTitle": "Xem trước ảnh",
   "shareAction": "Chia sẻ",
@@ -256,17 +256,17 @@
     }
   },
   "reportGeneratedFooter": "Tạo bởi Chiti",
-  "shareReportText": "Báo cáo chi tiêu chuyến đi {tripName}",
+  "shareReportText": "Báo cáo chi tiêu nhóm {groupName}",
   "@shareReportText": {
     "placeholders": {
-      "tripName": {
+      "groupName": {
         "type": "String"
       }
     }
   },
   "statsEmptyTitle": "Chưa có khoản chi nào",
   "statsEmptyHint": "Thêm chi tiêu để xem bảng thống kê và kế hoạch thanh toán.",
-  "kpiTotalSpent": "Tổng chi tiêu chuyến đi",
+  "kpiTotalSpent": "Tổng chi tiêu nhóm",
   "kpiAveragePerPerson": "TB / người",
   "kpiExpenseCount": "Số khoản chi",
   "kpiLargestExpense": "Khoản chi lớn nhất",
@@ -322,10 +322,10 @@
   "copyText": "Sao chép",
   "copiedToClipboard": "Đã sao chép vào clipboard",
 
-  "reportTitle": "BÁO CÁO CHUYẾN ĐI \"{tripName}\"",
+  "reportTitle": "BÁO CÁO NHÓM \"{groupName}\"",
   "@reportTitle": {
     "placeholders": {
-      "tripName": {
+      "groupName": {
         "type": "String"
       }
     }
@@ -445,9 +445,12 @@
     }
   },
 
-  "categoryFood": "Ăn uống",
+  "categorySports": "Thể thao & Sân bãi",
+  "categoryDining": "Ăn uống & Tiệc tùng",
+  "categoryCafe": "Cafe & Trà đá",
   "categoryTransport": "Di chuyển",
-  "categoryLodging": "Lưu trú",
-  "categoryActivities": "Vui chơi",
+  "categoryHousing": "Sinh hoạt & Tiền phòng",
+  "categoryEntertainment": "Vui chơi & Giải trí",
+  "categoryShopping": "Mua sắm chung",
   "categoryOther": "Khác"
 }

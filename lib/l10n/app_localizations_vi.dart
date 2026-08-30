@@ -54,23 +54,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get vietnameseLanguage => 'Tiếng Việt';
 
   @override
-  String get myTrips => 'Chuyến đi của tôi';
+  String get myGroups => 'Nhóm của tôi';
 
   @override
-  String get noTripsYet => 'Chưa có chuyến đi nào';
+  String get noGroupsYet => 'Chưa có nhóm nào';
 
   @override
-  String get noTripsHint => 'Nhấn + để tạo chuyến đi đầu tiên';
+  String get noGroupsHint => 'Nhấn + để tạo nhóm đầu tiên';
 
   @override
-  String get newTrip => 'Chuyến đi mới';
+  String get newGroup => 'Nhóm mới';
 
   @override
-  String get deleteTripTitle => 'Xóa chuyến đi?';
+  String get deleteGroupTitle => 'Xóa nhóm?';
 
   @override
-  String deleteTripContent(String tripName) {
-    return 'Xóa \"$tripName\" và toàn bộ chi phí của chuyến đi?';
+  String deleteGroupContent(String groupName) {
+    return 'Xóa \"$groupName\" và toàn bộ chi phí của nhóm?';
   }
 
   @override
@@ -83,10 +83,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get tabSummary => 'Tổng kết';
 
   @override
-  String get editTrip => 'Sửa chuyến đi';
+  String get editGroup => 'Sửa nhóm';
 
   @override
-  String get tripNotFound => 'Không tìm thấy chuyến đi';
+  String get groupNotFound => 'Không tìm thấy nhóm';
 
   @override
   String get noExpensesYet => 'Chưa có khoản chi nào';
@@ -100,13 +100,13 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get createTrip => 'Tạo chuyến đi';
+  String get createGroup => 'Tạo nhóm';
 
   @override
-  String get tripName => 'Tên chuyến đi';
+  String get groupName => 'Tên nhóm';
 
   @override
-  String get destination => 'Điểm đến';
+  String get location => 'Địa điểm';
 
   @override
   String get currency => 'Tiền tệ';
@@ -141,7 +141,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get expenseTitle => 'Tiêu đề';
 
   @override
-  String get expenseTitleHint => 'Ăn tối ở Biển, Grab về khách sạn…';
+  String get expenseTitleHint => 'Ăn tối, thuê sân cầu lông, tiền nhà, Grab…';
 
   @override
   String get amount => 'Số tiền';
@@ -244,7 +244,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String removeParticipantContent(String name) {
-    return 'Xóa $name khỏi chuyến này?\nPhần chia và khoản chi của họ cũng sẽ bị xóa.';
+    return 'Xóa $name khỏi nhóm này?\nPhần chia và khoản chi của họ cũng sẽ bị xóa.';
   }
 
   @override
@@ -257,8 +257,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get contactHint => 'SĐT / email / handle';
 
   @override
-  String get noteForTripOptional =>
-      'Ghi chú cho chuyến đi này (không bắt buộc)';
+  String get noteForGroupOptional => 'Ghi chú cho nhóm này (không bắt buộc)';
 
   @override
   String get noteHint => 'VD: Đặt cọc sớm, giảm giá chay…';
@@ -343,13 +342,13 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get copyTripReport => 'Sao chép báo cáo chuyến đi';
+  String get copyGroupReport => 'Sao chép báo cáo nhóm';
 
   @override
   String get shareSummary => 'Chia sẻ tổng kết';
 
   @override
-  String get reportCopied => 'Đã sao chép báo cáo chuyến đi';
+  String get groupReportCopied => 'Đã sao chép báo cáo nhóm';
 
   @override
   String get captureReport => 'Chụp ảnh bảng kê';
@@ -375,8 +374,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get reportGeneratedFooter => 'Tạo bởi Chiti';
 
   @override
-  String shareReportText(String tripName) {
-    return 'Báo cáo chi tiêu chuyến đi $tripName';
+  String shareReportText(String groupName) {
+    return 'Báo cáo chi tiêu nhóm $groupName';
   }
 
   @override
@@ -387,7 +386,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Thêm chi tiêu để xem bảng thống kê và kế hoạch thanh toán.';
 
   @override
-  String get kpiTotalSpent => 'Tổng chi tiêu chuyến đi';
+  String get kpiTotalSpent => 'Tổng chi tiêu nhóm';
 
   @override
   String get kpiAveragePerPerson => 'TB / người';
@@ -449,8 +448,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get copiedToClipboard => 'Đã sao chép vào clipboard';
 
   @override
-  String reportTitle(String tripName) {
-    return 'BÁO CÁO CHUYẾN ĐI \"$tripName\"';
+  String reportTitle(String groupName) {
+    return 'BÁO CÁO NHÓM \"$groupName\"';
   }
 
   @override
@@ -526,16 +525,25 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get categoryFood => 'Ăn uống';
+  String get categorySports => 'Thể thao & Sân bãi';
+
+  @override
+  String get categoryDining => 'Ăn uống & Tiệc tùng';
+
+  @override
+  String get categoryCafe => 'Cafe & Trà đá';
 
   @override
   String get categoryTransport => 'Di chuyển';
 
   @override
-  String get categoryLodging => 'Lưu trú';
+  String get categoryHousing => 'Sinh hoạt & Tiền phòng';
 
   @override
-  String get categoryActivities => 'Vui chơi';
+  String get categoryEntertainment => 'Vui chơi & Giải trí';
+
+  @override
+  String get categoryShopping => 'Mua sắm chung';
 
   @override
   String get categoryOther => 'Khác';

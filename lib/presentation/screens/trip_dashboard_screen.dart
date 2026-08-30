@@ -19,7 +19,7 @@ class TripDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.myTrips),
+        title: Text(l10n.myGroups),
         centerTitle: true,
         actions: [
           IconButton(
@@ -51,12 +51,12 @@ class TripDashboardScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    l10n.noTripsYet,
+                    l10n.noGroupsYet,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    l10n.noTripsHint,
+                    l10n.noGroupsHint,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -82,7 +82,7 @@ class TripDashboardScreen extends ConsumerWidget {
           );
         },
         icon: const Icon(Icons.add),
-        label: Text(l10n.newTrip),
+        label: Text(l10n.newGroup),
       ),
     );
   }
@@ -150,8 +150,8 @@ class _TripCard extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteTripTitle),
-        content: Text(l10n.deleteTripContent(trip.name)),
+        title: Text(l10n.deleteGroupTitle),
+        content: Text(l10n.deleteGroupContent(trip.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),

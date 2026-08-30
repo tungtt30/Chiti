@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const int _dbVersion = 5;
+  static const int _dbVersion = 6;
   static Database? _database;
 
   Future<Database> get database async {
@@ -33,8 +33,10 @@ class DatabaseHelper {
 
   /// v3 -> v4 adds the additive `category` column to expenses.
   /// v4 -> v5 adds `host_id` + `settlement_mode` to trips (host/treasurer
-  /// settlement mode). All steps are additive and applied for any older
-  /// version, so upgrading from v3 straight to v5 also works.
+  /// settlement mode). v5 -> v6 remaps the legacy trip-era category ids
+  /// ('Food', 'Lodging', 'Activities', ...) onto the multi-purpose preset set.
+  /// All steps are additive and applied for any older version, so upgrading
+  /// from v3 straight to v6 also works.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 3) {
       await _dropSchema(db);
@@ -62,6 +64,18 @@ class DatabaseHelper {
             "ALTER TABLE trips ADD COLUMN settlement_mode TEXT NOT NULL DEFAULT 'host'",
           );
         }
+      }
+      if (oldVersion <= 5) {
+        await db.execute('''
+          UPDATE expenses SET category = CASE category
+            WHEN 'Food' THEN 'dining'
+            WHEN 'Transport' THEN 'transport'
+            WHEN 'Lodging' THEN 'housing'
+            WHEN 'Activities' THEN 'entertainment'
+            WHEN 'Other' THEN 'other'
+            ELSE category
+          END
+        ''');
       }
     }
   }
@@ -114,7 +128,7 @@ class DatabaseHelper {
         title TEXT NOT NULL,
         amount REAL NOT NULL,
         payer_id TEXT NOT NULL,
-        category TEXT NOT NULL DEFAULT 'Other',
+        category TEXT NOT NULL DEFAULT 'other',
         created_at INTEGER NOT NULL,
         FOREIGN KEY (trip_id) REFERENCES trips(id) ON DELETE CASCADE,
         FOREIGN KEY (payer_id) REFERENCES participants(id) ON DELETE CASCADE

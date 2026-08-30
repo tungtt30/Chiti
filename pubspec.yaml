@@ -1,5 +1,5 @@
 name: chiti
-description: "An offline-first Travel Expense Splitting app."
+description: "Group expense & bill splitting app for trips, sports clubs, dining, roommates and hangouts."
 publish_to: 'none'
 version: 1.0.0+1
 

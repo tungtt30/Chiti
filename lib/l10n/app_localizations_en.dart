@@ -54,23 +54,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vietnameseLanguage => 'Tiếng Việt';
 
   @override
-  String get myTrips => 'My Trips';
+  String get myGroups => 'My Groups';
 
   @override
-  String get noTripsYet => 'No trips yet';
+  String get noGroupsYet => 'No groups yet';
 
   @override
-  String get noTripsHint => 'Tap + to create your first trip';
+  String get noGroupsHint => 'Tap + to create your first group';
 
   @override
-  String get newTrip => 'New Trip';
+  String get newGroup => 'New Group';
 
   @override
-  String get deleteTripTitle => 'Delete trip?';
+  String get deleteGroupTitle => 'Delete group?';
 
   @override
-  String deleteTripContent(String tripName) {
-    return 'Remove \"$tripName\" and all its expenses?';
+  String deleteGroupContent(String groupName) {
+    return 'Remove \"$groupName\" and all its expenses?';
   }
 
   @override
@@ -83,10 +83,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabSummary => 'Summary';
 
   @override
-  String get editTrip => 'Edit Trip';
+  String get editGroup => 'Edit Group';
 
   @override
-  String get tripNotFound => 'Trip not found';
+  String get groupNotFound => 'Group not found';
 
   @override
   String get noExpensesYet => 'No expenses yet';
@@ -100,13 +100,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get createTrip => 'Create Trip';
+  String get createGroup => 'Create Group';
 
   @override
-  String get tripName => 'Trip Name';
+  String get groupName => 'Group Name';
 
   @override
-  String get destination => 'Destination';
+  String get location => 'Location';
 
   @override
   String get currency => 'Currency';
@@ -141,7 +141,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseTitle => 'Title';
 
   @override
-  String get expenseTitleHint => 'Dinner at Beach, Grab to Hotel…';
+  String get expenseTitleHint => 'Dinner, badminton court, rent, Grab…';
 
   @override
   String get amount => 'Amount';
@@ -245,7 +245,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String removeParticipantContent(String name) {
-    return 'Remove $name from this trip?\nTheir shares and payers will be removed too.';
+    return 'Remove $name from this group?\nTheir shares and payers will be removed too.';
   }
 
   @override
@@ -258,7 +258,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactHint => 'Phone / email / handle';
 
   @override
-  String get noteForTripOptional => 'Note for this trip (optional)';
+  String get noteForGroupOptional => 'Note for this group (optional)';
 
   @override
   String get noteHint => 'e.g. Paid deposit early, vegetarian discount…';
@@ -343,13 +343,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get copyTripReport => 'Copy trip report';
+  String get copyGroupReport => 'Copy group report';
 
   @override
   String get shareSummary => 'Share Summary';
 
   @override
-  String get reportCopied => 'Trip report copied';
+  String get groupReportCopied => 'Group report copied';
 
   @override
   String get captureReport => 'Capture full report as image';
@@ -375,8 +375,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportGeneratedFooter => 'Made with Chiti';
 
   @override
-  String shareReportText(String tripName) {
-    return 'Expense report for $tripName';
+  String shareReportText(String groupName) {
+    return 'Group expense report for $groupName';
   }
 
   @override
@@ -449,8 +449,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copiedToClipboard => 'Copied to clipboard';
 
   @override
-  String reportTitle(String tripName) {
-    return 'TRIP REPORT \"$tripName\"';
+  String reportTitle(String groupName) {
+    return 'GROUP REPORT \"$groupName\"';
   }
 
   @override
@@ -526,16 +526,25 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get categoryFood => 'Food';
+  String get categorySports => 'Sports & Court';
+
+  @override
+  String get categoryDining => 'Dining & Drinks';
+
+  @override
+  String get categoryCafe => 'Coffee & Hangouts';
 
   @override
   String get categoryTransport => 'Transport';
 
   @override
-  String get categoryLodging => 'Lodging';
+  String get categoryHousing => 'Housing & Utilities';
 
   @override
-  String get categoryActivities => 'Activities';
+  String get categoryEntertainment => 'Entertainment';
+
+  @override
+  String get categoryShopping => 'Shared Shopping';
 
   @override
   String get categoryOther => 'Other';

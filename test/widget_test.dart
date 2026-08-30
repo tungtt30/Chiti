@@ -10,6 +10,6 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
     await tester.pumpAndSettle();
 
-    expect(find.text('My Trips'), findsOneWidget);
+    expect(find.text('My Groups'), findsOneWidget);
   });
 }

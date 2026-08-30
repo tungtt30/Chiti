@@ -16,7 +16,7 @@ class Expense {
     required this.title,
     required this.amount,
     required this.payerId,
-    this.category = 'Other',
+    this.category = 'other',
     required this.createdAt,
   });
 
@@ -56,7 +56,7 @@ class Expense {
       title: map['title'] as String,
       amount: (map['amount'] as num).toDouble(),
       payerId: map['payer_id'] as String,
-      category: (map['category'] as String?) ?? 'Other',
+      category: (map['category'] as String?) ?? 'other',
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
     );
   }

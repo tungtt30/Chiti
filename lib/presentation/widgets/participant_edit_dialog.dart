@@ -106,7 +106,7 @@ class _EditParticipantDialogState extends State<EditParticipantDialog> {
                 controller: _noteCtrl,
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: l10n.noteForTripOptional,
+                  labelText: l10n.noteForGroupOptional,
                   hintText: l10n.noteHint,
                   border: const OutlineInputBorder(),
                 ),

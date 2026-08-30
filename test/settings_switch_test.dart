@@ -12,7 +12,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MyApp()));
     await tester.pumpAndSettle();
 
-    expect(find.text('My Trips'), findsOneWidget);
+    expect(find.text('My Groups'), findsOneWidget);
 
     // Open Settings from the dashboard app bar.
     await tester.tap(find.byIcon(Icons.settings_outlined));
@@ -31,7 +31,7 @@ void main() {
     // Back on the dashboard, the title is localized.
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
-    expect(find.text('Chuyến đi của tôi'), findsOneWidget);
+    expect(find.text('Nhóm của tôi'), findsOneWidget);
 
     // Switch back to English.
     await tester.tap(find.byIcon(Icons.settings_outlined));
@@ -41,7 +41,7 @@ void main() {
     expect(prefs.getString('app_locale'), 'en');
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
-    expect(find.text('My Trips'), findsOneWidget);
+    expect(find.text('My Groups'), findsOneWidget);
 
     // System default clears the saved language.
     await tester.tap(find.byIcon(Icons.settings_outlined));

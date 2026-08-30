@@ -70,13 +70,12 @@ TripSummaryStats computeTripSummary({
     );
   }).toList();
 
-  // Category distribution, ranked descending. Unknown categories are folded
-  // into 'Other' so stale/legacy rows never break the dashboard.
+  // Category distribution, ranked descending. Legacy/unknown ids are folded
+  // into the current preset set via normalize so stale rows never break the
+  // dashboard.
   final categoryTotals = <String, double>{};
   for (final e in expenses) {
-    final k = ExpenseCategory.all.contains(e.category)
-        ? e.category
-        : ExpenseCategory.fallback;
+    final k = ExpenseCategory.normalize(e.category);
     categoryTotals[k] = (categoryTotals[k] ?? 0) + e.amount;
   }
   final categories = categoryTotals.entries.map((entry) {

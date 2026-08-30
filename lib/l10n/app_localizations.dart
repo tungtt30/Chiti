@@ -182,41 +182,41 @@ abstract class AppLocalizations {
   /// **'Tiếng Việt'**
   String get vietnameseLanguage;
 
-  /// No description provided for @myTrips.
+  /// No description provided for @myGroups.
   ///
   /// In en, this message translates to:
-  /// **'My Trips'**
-  String get myTrips;
+  /// **'My Groups'**
+  String get myGroups;
 
-  /// No description provided for @noTripsYet.
+  /// No description provided for @noGroupsYet.
   ///
   /// In en, this message translates to:
-  /// **'No trips yet'**
-  String get noTripsYet;
+  /// **'No groups yet'**
+  String get noGroupsYet;
 
-  /// No description provided for @noTripsHint.
+  /// No description provided for @noGroupsHint.
   ///
   /// In en, this message translates to:
-  /// **'Tap + to create your first trip'**
-  String get noTripsHint;
+  /// **'Tap + to create your first group'**
+  String get noGroupsHint;
 
-  /// No description provided for @newTrip.
+  /// No description provided for @newGroup.
   ///
   /// In en, this message translates to:
-  /// **'New Trip'**
-  String get newTrip;
+  /// **'New Group'**
+  String get newGroup;
 
-  /// No description provided for @deleteTripTitle.
+  /// No description provided for @deleteGroupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Delete trip?'**
-  String get deleteTripTitle;
+  /// **'Delete group?'**
+  String get deleteGroupTitle;
 
-  /// No description provided for @deleteTripContent.
+  /// No description provided for @deleteGroupContent.
   ///
   /// In en, this message translates to:
-  /// **'Remove \"{tripName}\" and all its expenses?'**
-  String deleteTripContent(String tripName);
+  /// **'Remove \"{groupName}\" and all its expenses?'**
+  String deleteGroupContent(String groupName);
 
   /// No description provided for @tabExpenses.
   ///
@@ -236,17 +236,17 @@ abstract class AppLocalizations {
   /// **'Summary'**
   String get tabSummary;
 
-  /// No description provided for @editTrip.
+  /// No description provided for @editGroup.
   ///
   /// In en, this message translates to:
-  /// **'Edit Trip'**
-  String get editTrip;
+  /// **'Edit Group'**
+  String get editGroup;
 
-  /// No description provided for @tripNotFound.
+  /// No description provided for @groupNotFound.
   ///
   /// In en, this message translates to:
-  /// **'Trip not found'**
-  String get tripNotFound;
+  /// **'Group not found'**
+  String get groupNotFound;
 
   /// No description provided for @noExpensesYet.
   ///
@@ -266,23 +266,23 @@ abstract class AppLocalizations {
   /// **'Paid by {paidBy} · {joined} of {total} joined'**
   String expenseSubtitle(String paidBy, int joined, int total);
 
-  /// No description provided for @createTrip.
+  /// No description provided for @createGroup.
   ///
   /// In en, this message translates to:
-  /// **'Create Trip'**
-  String get createTrip;
+  /// **'Create Group'**
+  String get createGroup;
 
-  /// No description provided for @tripName.
+  /// No description provided for @groupName.
   ///
   /// In en, this message translates to:
-  /// **'Trip Name'**
-  String get tripName;
+  /// **'Group Name'**
+  String get groupName;
 
-  /// No description provided for @destination.
+  /// No description provided for @location.
   ///
   /// In en, this message translates to:
-  /// **'Destination'**
-  String get destination;
+  /// **'Location'**
+  String get location;
 
   /// No description provided for @currency.
   ///
@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @expenseTitleHint.
   ///
   /// In en, this message translates to:
-  /// **'Dinner at Beach, Grab to Hotel…'**
+  /// **'Dinner, badminton court, rent, Grab…'**
   String get expenseTitleHint;
 
   /// No description provided for @amount.
@@ -527,7 +527,7 @@ abstract class AppLocalizations {
   /// No description provided for @removeParticipantContent.
   ///
   /// In en, this message translates to:
-  /// **'Remove {name} from this trip?\nTheir shares and payers will be removed too.'**
+  /// **'Remove {name} from this group?\nTheir shares and payers will be removed too.'**
   String removeParticipantContent(String name);
 
   /// No description provided for @nameField.
@@ -548,11 +548,11 @@ abstract class AppLocalizations {
   /// **'Phone / email / handle'**
   String get contactHint;
 
-  /// No description provided for @noteForTripOptional.
+  /// No description provided for @noteForGroupOptional.
   ///
   /// In en, this message translates to:
-  /// **'Note for this trip (optional)'**
-  String get noteForTripOptional;
+  /// **'Note for this group (optional)'**
+  String get noteForGroupOptional;
 
   /// No description provided for @noteHint.
   ///
@@ -692,11 +692,11 @@ abstract class AppLocalizations {
   /// **'Paid: {count} of {total}'**
   String paidProgress(int count, int total);
 
-  /// No description provided for @copyTripReport.
+  /// No description provided for @copyGroupReport.
   ///
   /// In en, this message translates to:
-  /// **'Copy trip report'**
-  String get copyTripReport;
+  /// **'Copy group report'**
+  String get copyGroupReport;
 
   /// No description provided for @shareSummary.
   ///
@@ -704,11 +704,11 @@ abstract class AppLocalizations {
   /// **'Share Summary'**
   String get shareSummary;
 
-  /// No description provided for @reportCopied.
+  /// No description provided for @groupReportCopied.
   ///
   /// In en, this message translates to:
-  /// **'Trip report copied'**
-  String get reportCopied;
+  /// **'Group report copied'**
+  String get groupReportCopied;
 
   /// No description provided for @captureReport.
   ///
@@ -755,8 +755,8 @@ abstract class AppLocalizations {
   /// No description provided for @shareReportText.
   ///
   /// In en, this message translates to:
-  /// **'Expense report for {tripName}'**
-  String shareReportText(String tripName);
+  /// **'Group expense report for {groupName}'**
+  String shareReportText(String groupName);
 
   /// No description provided for @statsEmptyTitle.
   ///
@@ -881,8 +881,8 @@ abstract class AppLocalizations {
   /// No description provided for @reportTitle.
   ///
   /// In en, this message translates to:
-  /// **'TRIP REPORT \"{tripName}\"'**
-  String reportTitle(String tripName);
+  /// **'GROUP REPORT \"{groupName}\"'**
+  String reportTitle(String groupName);
 
   /// No description provided for @reportTotalAverage.
   ///
@@ -979,11 +979,23 @@ abstract class AppLocalizations {
   /// **'{from} to {to}: {amount}'**
   String transferReportLine(String from, String to, String amount);
 
-  /// No description provided for @categoryFood.
+  /// No description provided for @categorySports.
   ///
   /// In en, this message translates to:
-  /// **'Food'**
-  String get categoryFood;
+  /// **'Sports & Court'**
+  String get categorySports;
+
+  /// No description provided for @categoryDining.
+  ///
+  /// In en, this message translates to:
+  /// **'Dining & Drinks'**
+  String get categoryDining;
+
+  /// No description provided for @categoryCafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Coffee & Hangouts'**
+  String get categoryCafe;
 
   /// No description provided for @categoryTransport.
   ///
@@ -991,17 +1003,23 @@ abstract class AppLocalizations {
   /// **'Transport'**
   String get categoryTransport;
 
-  /// No description provided for @categoryLodging.
+  /// No description provided for @categoryHousing.
   ///
   /// In en, this message translates to:
-  /// **'Lodging'**
-  String get categoryLodging;
+  /// **'Housing & Utilities'**
+  String get categoryHousing;
 
-  /// No description provided for @categoryActivities.
+  /// No description provided for @categoryEntertainment.
   ///
   /// In en, this message translates to:
-  /// **'Activities'**
-  String get categoryActivities;
+  /// **'Entertainment'**
+  String get categoryEntertainment;
+
+  /// No description provided for @categoryShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Shopping'**
+  String get categoryShopping;
 
   /// No description provided for @categoryOther.
   ///
