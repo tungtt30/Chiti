@@ -1,34 +1,138 @@
-# Chiti — Group Expense & Bill Splitter
+# 💸 Chiti — Multipurpose Group Expense & Bill Splitting
 
-Offline-first Flutter app for tracking shared expenses within any group —
-sports clubs (badminton, football), dining out, roommate living costs,
-hangouts, and trips — and settling balances among members. Data lives
-on-device in SQLite, so it works fully offline. **Android & iOS only**
-(desktop/web out of scope).
+> A fast, elegant, and privacy-focused Android app to split bills, manage group funds, and settle debts for sports clubs, hangouts, and trips.
 
-## Features
+<p align="center">
+  <img alt="Platform: Android" src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white">
+  <img alt="Flutter" src="https://img.shields.io/badge/Flutter-3.47+-02569B?logo=flutter&logoColor=white">
+  <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/tungtt30/Chiti/build.yml?label=CI&logo=githubactions&logoColor=white">
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg">
+</p>
 
-- **Groups** — create/edit/delete groups (trips, clubs, roommates, …) with
-  name, location, currency (VND, USD, …), and a start/end date range.
-- **Members & Notes** — add/edit/remove participants with avatar color, contact
-  info, and a per-person note for the group (e.g. *"Paid deposit early"*,
-  *"Vegetarian discount"*).
-- **Expenses** — title, date, category (Sports / Dining / Cafe / Transport /
-  Housing / Entertainment / Shopping / Other), **single or multiple payers**
-  with the exact amount each paid, and flexible splitting:
-  - **Shared expense toggle** — split equally among all active members.
-  - **Split Equally** button — instant equal division for the selected people.
-  - **Custom Amounts** — exact amount per participant.
-  - **Weights** — weighted shares (e.g. 2x for two nights).
-  - Per-person inline notes on each portion (e.g. *"Owes flight ticket
-    separately"*).
-- **Summary dashboard** — member audit (Paid / Owes / Net), color-coded
-  settlement plan (Host/Thủ quỹ or peer-to-peer) with **Paid/Completed**
-  checkboxes, and a **Recalculate** button that persists the new plan.
-- **Long-image export** — capture the full summary or expense list as a PNG
-  and share or save to gallery.
+---
 
-## Architecture
+## 🌟 Why Chiti?
+
+Most bill-splitting apps force you to sign up for an account, sync your data to
+the cloud, and wade through ads and subscription upsells just to split a
+dinner bill. Chiti flips that script: it's a **local-first, serverless**
+expense tracker that lives entirely on your device. Open the app, create a
+group, and start splitting in seconds — no sign-up, no ads, no internet
+required.
+
+Whether it's a **badminton club** chipping in for court fees, a **group trip**
+with a shared budget, **roommates** splitting rent and groceries, or a Friday
+night **dinner hangout**, Chiti handles it all with a beautiful, calm interface
+that makes settling up genuinely pleasant.
+
+## ✨ Key Features
+
+### 🎯 Smart & Flexible Splitting
+
+- **Selective subset splitting** — pick exactly who joined each activity (e.g.,
+  only 4 of 10 people go for drinks); non-participants owe nothing.
+- **Three split modes** — split equally, enter exact custom amounts, or use
+  weighted shares (e.g., 2× for a two-night stay).
+- **Multiple payers per expense** — record exactly how much each person paid
+  (A paid the bill, B covered the tip).
+- **Per-person notes** — annotate any portion (*"Owes flight ticket
+  separately"*, *"Vegetarian discount"*) for full transparency.
+- **8 smart categories** — Sports 🏸, Dining 🍜, Coffee ☕, Transport 🚗,
+  Housing 🏠, Entertainment 🎟️, Shopping 🛍️, and Other 📦.
+
+### 👑 Host Settlement System
+
+- **Host / Thủ quỹ mode** — debtors transfer once to a single **Host**, who
+  then refunds every creditor: two phases, zero mathematical discrepancy.
+- **Peer-to-peer mode** — the greedy settlement engine simplifies debts into a
+  near-minimal transfer list (`A pays 150,000 ₫ to B`).
+- **Live settlement plan** — color-coded, with Paid/Completed checkboxes and a
+  one-tap **Recalculate** that persists the new plan.
+
+### 📊 Visual Statistics & Export
+
+- **Real-time summary dashboard** — per-member audit (Paid / Owes / Net), KPI
+  cards, and category distribution charts.
+- **1-tap copy & share** — export a plain-text report straight to group chats
+  (Zalo, Telegram, Messenger).
+- **Long-image export** — capture the full summary or expense list as a PNG and
+  share or save it to the gallery.
+
+### 🌸 Polished Material 3 & Sakura Theme
+
+- **Material 3** design with Light, Dark, and System theme modes.
+- **Custom Pastel Sakura theme** — a soft cherry-blossom pink palette with
+  falling **petal particle effects** across the app.
+- Smooth, responsive animations and rounded, card-based layouts.
+
+### 🔒 Local & Serverless Security
+
+- **100% offline** — all data stored in local SQLite (`chiti.db`). No accounts,
+  no internet tracking, no cloud sync.
+- **No network permission** — the app literally cannot phone home.
+- **Ultra-fast** — instant startup, instant queries, even with years of
+  expenses.
+
+### ⚡ Smart Input UX
+
+- **Real-time thousands separator** formatting as you type (`100,000`).
+- **VND by default** — with 10 currencies available per group
+  (VND, USD, EUR, GBP, JPY, THB, KRW, CNY, AUD, CAD).
+- **Launcher quick shortcuts** — long-press the app icon for *Add Expense*,
+  *Create Group*, or *Latest Summary*.
+- **Home-screen widget** — jump straight into your recent group.
+
+## 📱 Screenshots & Demo
+
+> Screenshots coming soon — the app is in active development.
+
+| Home Dashboard | Expense Entry | Summary & Settlement |
+|:---:|:---:|:---:|
+| ![Home Dashboard](docs/screenshots/home.png) | ![Expense Entry](docs/screenshots/expense.png) | ![Summary](docs/screenshots/summary.png) |
+
+## 🛠️ Tech Stack
+
+- **Framework:** Flutter (Android-optimized, stable channel)
+- **State Management:** Riverpod (`flutter_riverpod`)
+- **Local Database:** SQLite (`sqflite`)
+- **Localization:** Vietnamese (`vi`) & English (`en`)
+- **CI/CD:** GitHub Actions — automated analyze, test, and release APK builds
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Flutter SDK (Stable channel, 3.47+)
+- Android Studio / Android SDK 21+
+
+### Installation & Run
+
+```bash
+git clone https://github.com/tungtt30/Chiti.git
+cd chiti
+flutter pub get
+flutter run
+```
+
+### Build a Release APK
+
+```bash
+flutter build apk --release
+```
+
+### Run Tests
+
+```bash
+flutter test
+```
+
+### CI / Automated Releases
+
+Pushing to `android-release` triggers the automated pipeline: static analysis,
+tests, a release APK build, and a **GitHub Release** with the APK attached.
+Pushes/PRs to `main` run analyze + test + build (APK & AppBundle) instead.
+
+## 🧱 Architecture
 
 Strict Clean Architecture separation:
 
@@ -37,19 +141,21 @@ lib/
 ├── core/                        # Pure logic, no Flutter deps
 │   ├── constants.dart           # Categories, split modes, currencies, colors
 │   ├── formatters.dart          # Currency & date formatting (intl)
-│   ├── id_generator.dart        # UUID ids (uuid)
-│   └── settlement_calculator.dart  # Greedy settlement algorithm + split helpers
+│   ├── settlement_calculator.dart  # Greedy settlement algorithm + split helpers
+│   ├── summary_calculator.dart  # Net balances & summary aggregation
+│   ├── trip_report_text.dart    # Plain-text report for group-chat sharing
+│   └── theme/sakura_theme.dart  # Pastel Sakura design system
 ├── data/
 │   ├── database_helper.dart     # SQLite schema, FKs, migrations (sqflite)
 │   ├── repository.dart          # Data access / transactions
 │   └── models/                  # Trip, Participant, Expense, ExpenseSplit,
 │                                # ExpensePayer, Settlement
-├── providers/                    # Riverpod notifiers & derived providers
-│   └── providers.dart
+├── providers/                   # Riverpod notifiers & derived providers
 └── presentation/
-    ├── screens/                 # TripDashboard, TripDetail, AddExpense,
-    │                            # AddTrip, ManageParticipants
-    └── widgets/                 # SummaryTable, SettlementCard, chips
+    ├── screens/                 # Dashboard, TripDetail, AddExpense, AddTrip,
+    │                            # ManageParticipants, Settings
+    └── widgets/                 # SummaryTable, SettlementCard, chips,
+                                 # PetalField, KPI cards, category breakdown
 ```
 
 ### Settlement engine (greedy algorithm)
@@ -57,83 +163,15 @@ lib/
 `Net Balance = Total Paid − Total Share`. Debts are simplified greedily by always
 matching the largest debtor (biggest negative net) with the largest creditor
 (biggest positive net), producing a near-minimal transfer list
-(`[A] pays 150,000 VND to [B]`). Unit tested in `test/core/settlement_calculator_test.dart`
-via `flutter test`.
+(`[A] pays 150,000 VND to [B]`). In **Host mode**, all debtors pay the Host
+first, then the Host refunds every creditor — a two-phase flow with zero
+discrepancy. Unit tested in `test/core/settlement_calculator_test.dart`.
 
-## Getting started (Android & iOS)
+## 📜 License
 
-Requirements: Flutter **3.47+** stable and a configured toolchain for your target.
+This project is open source under the **MIT License** — free to use, modify,
+and distribute.
 
-```sh
-flutter pub get
-flutter run                      # pick an Android emulator or iOS simulator
-flutter test                     # runs unit + widget tests
-```
-
-### Android setup
-
-1. The app needs no network permission — SQLite is internal storage only.
-2. `android/app/build.gradle` already uses Flutter defaults. If you set a custom
-   `minSdkVersion`, keep it `>= 21` (sqflite requirement, current default is
-   fine).
-3. Run:
-   ```sh
-   flutter run -d <android-device>
-   # or a release APK:
-   flutter build apk --release
-   ```
-
-### iOS setup
-
-1. `sqflite` uses CocoaPods. With Flutter 3.38+, no `Podfile` is required — one
-   is generated on first iOS build, but if needed run `pod install` inside
-   `ios/`.
-2. No Info.plist permission keys are required (no camera/network/location).
-3. Run:
-   ```sh
-   flutter run -d <ios-simulator>
-   flutter build ios --release --no-codesign   # CI/simulator build
-   ```
-
-### Data & migrations
-
-Database: `chiti.db` in the app documents directory. Foreign keys are enforced
-via `PRAGMA foreign_keys = ON`; deleting a group/participant cascades to its
-expenses, splits, payers, and settlements. Current schema version is `6`
-(migrations: v4 adds `expenses.category`, v5 adds `host_id`/`settlement_mode`
-to `trips`, v6 remaps legacy category ids onto the current preset set).
-
-## Package manifest (`pubspec.yaml`)
-
-```yaml
-name: chiti
-description: "Group expense & bill splitting app for trips, sports clubs, dining, roommates and hangouts."
-publish_to: 'none'
-version: 1.0.0+1
-
-environment:
-  sdk: ^3.13.1
-
-dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.8
-  flutter_riverpod: ^2.6.1   # state management
-  sqflite: ^2.4.2           # local SQLite
-  path: ^1.9.1              # path joins for the DB
-  path_provider: ^2.1.5
-  intl: ^0.20.2             # currency & date formatting
-  uuid: ^4.5.1              # user ids
-  share_plus: ^10.0.0       # share captured report images
-  gal: ^2.3.0               # save captured report images to gallery
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^6.0.0
-  riverpod_generator: ^2.6.3
-  build_runner: ^2.4.15
-
-flutter:
-  uses-material-design: true
-```
+> **Note:** The `LICENSE` file has not been added to the repository yet. If you
+> plan to publish or distribute this project, add an official MIT `LICENSE`
+> file before your first release.
