@@ -21,6 +21,21 @@ String buildTripReportText({
     '💰 ${l10n.reportTotalAverage(formatCurrency(stats.totalSpent, currency), formatCurrency(stats.averagePerMember, currency))}',
   );
 
+  if (stats.totalSponsorship > 0) {
+    buf.writeln('\n🤝 ${l10n.reportSponsorshipsHeader}');
+    for (final s in stats.sponsorships) {
+      buf.writeln(
+        l10n.reportSponsorshipLine(
+          s.sponsorName,
+          formatCurrency(s.amount, currency),
+        ),
+      );
+    }
+    buf.writeln(
+      l10n.reportNetTotalLine(formatCurrency(stats.netTotal, currency)),
+    );
+  }
+
   if (stats.expenseCount > 0) {
     buf.write('\n👥 ${l10n.reportMembersHeader}\n');
     for (final m in stats.members) {

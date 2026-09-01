@@ -53,6 +53,30 @@ class KpiCards extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
+        if (stats.totalSponsorship > 0) ...[
+          Row(
+            children: [
+              Expanded(
+                child: _KpiCard(
+                  icon: Icons.volunteer_activism,
+                  iconColor: Colors.green.shade700,
+                  label: l10n.kpiTotalSponsorship,
+                  value: formatCurrency(stats.totalSponsorship, currency),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _KpiCard(
+                  icon: Icons.account_balance_wallet_outlined,
+                  iconColor: theme.colorScheme.primary,
+                  label: l10n.kpiNetToSplit,
+                  value: formatCurrency(stats.netTotal, currency),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
         if (stats.topExpense != null)
           _KpiCard(
             icon: Icons.emoji_events_outlined,

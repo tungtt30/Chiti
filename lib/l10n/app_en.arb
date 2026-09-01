@@ -363,6 +363,90 @@
   "copyText": "Copy",
   "copiedToClipboard": "Copied to clipboard",
 
+  "tabSponsorships": "Sponsorships",
+  "addSponsorship": "Add Sponsorship",
+  "editSponsorship": "Edit Sponsorship",
+  "saveSponsorship": "Save Sponsorship",
+  "deleteSponsorship": "Delete sponsorship",
+  "sponsorshipSectionTitle": "Sponsorships",
+  "sponsorshipType": "Sponsor type",
+  "sponsorshipTypeInternal": "Internal Member",
+  "sponsorshipTypeExternal": "External Sponsor",
+  "sponsorshipSponsor": "Sponsor",
+  "sponsorshipNote": "Note (optional)",
+  "sponsorshipNameHint": "e.g. Anh Nam tài trợ, Quỹ công ty tài trợ",
+  "sponsorshipMemberHint": "Pick the member who sponsors this group",
+  "sponsorshipNameRequired": "Enter the sponsor name",
+  "noSponsorshipsYet": "No sponsorships yet",
+  "noSponsorshipsHint": "Tap + to add sponsorship and reduce what everyone pays",
+  "deleteSponsorshipDialogTitle": "Delete sponsorship?",
+  "deleteSponsorshipDialogContent": "Remove the {amount} sponsorship by {name}?",
+  "@deleteSponsorshipDialogContent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "kpiTotalSponsorship": "Sponsored",
+  "kpiNetToSplit": "Net to split",
+  "sponsorshipTotalLine": "Total sponsored: {amount}",
+  "@sponsorshipTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sponsorshipNetToSplitLine": "Net to split: {amount}",
+  "@sponsorshipNetToSplitLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sponsorshipCovered": "Sponsorships cover {percent}% of expenses",
+  "@sponsorshipCovered": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "sponsorshipDiscountFactor": "Each member pays {percent}% of their share",
+  "@sponsorshipDiscountFactor": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "sponsorshipFullyCovered": "Fully covered by sponsorships 🎉",
+  "reportSponsorshipsHeader": "Sponsorships:",
+  "reportSponsorshipLine": "• {name}: {amount}",
+  "@reportSponsorshipLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetTotalLine": "Net to split: {amount}",
+  "@reportNetTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
   "reportTitle": "GROUP REPORT \"{groupName}\"",
   "@reportTitle": {
     "placeholders": {

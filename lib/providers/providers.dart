@@ -4,6 +4,7 @@ import '../core/id_generator.dart';
 import '../core/services/recent_group_service.dart';
 import '../core/services/widget_service.dart';
 import '../core/settlement_calculator.dart';
+import '../core/summary_calculator.dart';
 import '../data/models/models.dart';
 import '../data/repository.dart';
 
@@ -299,6 +300,7 @@ final summaryProvider = FutureProvider.autoDispose
       final participantsJoinedAsync = ref.watch(
         expenseParticipantsForTripProvider(tripId),
       );
+      final sponsorshipsAsync = ref.watch(sponsorshipsProvider(tripId));
 
       final participants =
           participantsAsync.valueOrNull ?? const <Participant>[];
@@ -307,6 +309,19 @@ final summaryProvider = FutureProvider.autoDispose
       final joined =
           participantsJoinedAsync.valueOrNull ??
           const <ExpenseParticipant>[];
+      final sponsorships =
+          sponsorshipsAsync.valueOrNull ?? const <Sponsorship>[];
+
+      final totalSpent = expenses.fold<double>(0, (sum, e) => sum + e.amount);
+      final totalSponsorship = sponsorships.fold<double>(
+        0,
+        (sum, s) => sum + s.amount,
+      );
+      // Sponsorships reduce every member's obligation proportionally.
+      final k = sponsorshipDiscountFactor(
+        totalSpent: totalSpent,
+        totalSponsorship: totalSponsorship,
+      );
 
       final totalPaid = <String, double>{};
       final totalShare = <String, double>{};
@@ -320,10 +335,12 @@ final summaryProvider = FutureProvider.autoDispose
         totalPaid[expense.payerId] =
             (totalPaid[expense.payerId] ?? 0) + expense.amount;
       }
-      // Obligation: only participants who joined incur a share.
+      // Obligation: only participants who joined incur a share, scaled by the
+      // sponsorship discount factor (adjusted consumption C').
       for (final member in joined) {
         totalShare[member.participantId] =
-            (totalShare[member.participantId] ?? 0) + member.shareAmount;
+            (totalShare[member.participantId] ?? 0) +
+            member.shareAmount * k;
       }
 
       return buildSummary(
@@ -415,6 +432,71 @@ class SettlementsNotifier extends StateNotifier<AsyncValue<List<Settlement>>> {
   Future<void> togglePaid(String id, bool isPaid) async {
     await _repo.setSettlementPaid(id, isPaid);
     await load();
+  }
+}
+
+// ---- Sponsorships ----
+
+final sponsorshipsProvider =
+    StateNotifierProvider.family<
+      SponsorshipsNotifier,
+      AsyncValue<List<Sponsorship>>,
+      String
+    >((ref, tripId) => SponsorshipsNotifier(ref, tripId));
+
+class SponsorshipsNotifier extends StateNotifier<AsyncValue<List<Sponsorship>>> {
+  final Ref ref;
+  final String tripId;
+  final AppRepository _repo;
+
+  SponsorshipsNotifier(this.ref, this.tripId)
+    : _repo = ref.read(repositoryProvider),
+      super(const AsyncValue.loading()) {
+    load();
+  }
+
+  Future<void> load() async {
+    state = const AsyncValue.loading();
+    try {
+      final sponsorships = await _repo.getSponsorships(tripId);
+      state = AsyncValue.data(sponsorships);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> addSponsorship({
+    required String sponsorName,
+    String? memberId,
+    required double amount,
+    String? note,
+  }) async {
+    await _repo.createSponsorship(
+      tripId: tripId,
+      sponsorName: sponsorName,
+      memberId: memberId,
+      amount: amount,
+      note: note,
+    );
+    await load();
+    // Sponsorships shrink every member's split, so the settlement plan,
+    // summary and home-screen widget must all recompute.
+    await ref.read(settlementsProvider(tripId).notifier).recalculate();
+    await refreshWidgetForTrip(ref, tripId);
+  }
+
+  Future<void> updateSponsorship(Sponsorship sponsorship) async {
+    await _repo.updateSponsorship(sponsorship);
+    await load();
+    await ref.read(settlementsProvider(tripId).notifier).recalculate();
+    await refreshWidgetForTrip(ref, tripId);
+  }
+
+  Future<void> deleteSponsorship(String id) async {
+    await _repo.deleteSponsorship(id);
+    await load();
+    await ref.read(settlementsProvider(tripId).notifier).recalculate();
+    await refreshWidgetForTrip(ref, tripId);
   }
 }
 

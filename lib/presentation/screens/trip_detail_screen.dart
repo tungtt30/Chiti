@@ -15,9 +15,11 @@ import '../../providers/providers.dart';
 import '../../providers/trip_summary_provider.dart';
 import '../widgets/expenses/expense_report_view.dart';
 import '../widgets/participant_edit_dialog.dart';
+import '../widgets/summary/sponsorship_tab.dart';
 import '../widgets/summary/summary_report_view.dart';
 import '../widgets/summary/summary_screen.dart';
 import 'add_edit_expense_screen.dart';
+import 'add_edit_sponsorship_screen.dart';
 import 'add_trip_screen.dart';
 import 'expense_detail_screen.dart';
 import 'manage_participants_screen.dart';
@@ -25,8 +27,8 @@ import 'manage_participants_screen.dart';
 class TripDetailScreen extends ConsumerStatefulWidget {
   final String tripId;
 
-  /// Which tab to open on first build (0 = Expenses, 2 = Summary). Used by
-  /// quick actions and widget deep links.
+  /// Which tab to open on first build (0 = Expenses, 2 = Summary,
+  /// 3 = Sponsorships). Used by quick actions and widget deep links.
   final int initialTab;
 
   /// Invoked when the member list requests the Summary tab (long-press ->
@@ -57,9 +59,9 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
     // Opening a group marks it as the target of the quick actions.
     RecentGroupService.saveRecentGroup(_tripId);
     _tabController = TabController(
-      length: 3,
+      length: 4,
       vsync: this,
-      initialIndex: widget.initialTab.clamp(0, 2),
+      initialIndex: widget.initialTab.clamp(0, 3),
     );
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
@@ -311,6 +313,20 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
         icon: const Icon(Icons.share),
         label: Text(l10n.shareSummary),
       ),
+      3 => FloatingActionButton.extended(
+        key: const ValueKey('fab_sponsorship'),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddEditSponsorshipScreen(tripId: _tripId),
+            ),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: Text(l10n.addSponsorship),
+      ),
       _ => null,
     };
   }
@@ -347,6 +363,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
                   icon: const Icon(Icons.balance),
                   text: l10n.tabSummary,
                 ),
+                Tab(
+                  icon: const Icon(Icons.volunteer_activism),
+                  text: l10n.tabSponsorships,
+                ),
               ],
             ),
             actions: [
@@ -380,6 +400,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen>
                     () => _tabController.animateTo(2),
               ),
               SummaryScreen(tripId: _tripId, currency: trip.currency),
+              SponsorshipTab(tripId: _tripId, currency: trip.currency),
             ],
           ),
           // A single, tab-aware action button at the root Scaffold. The

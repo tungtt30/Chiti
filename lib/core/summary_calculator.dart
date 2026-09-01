@@ -3,6 +3,23 @@ import '../data/models/models.dart';
 
 double _round2(double value) => double.parse(value.toStringAsFixed(2));
 
+/// Sponsorship discount factor: `k = max(0, E_total - S_total) / E_total`.
+///
+/// - No sponsorships (`S = 0`): `k = 1` — members pay their full consumption.
+/// - Partial coverage: each member's consumption is reduced proportionally.
+/// - Full coverage (`S >= E`): `k = 0` — nothing is split, every member gets
+///   their advance refunded.
+/// - No expenses (`E = 0`): returns `1` (nothing to discount).
+double sponsorshipDiscountFactor({
+  required double totalSpent,
+  required double totalSponsorship,
+}) {
+  if (totalSpent <= 0) return 1;
+  final net = totalSpent - totalSponsorship;
+  if (net <= 0) return 0;
+  return net / totalSpent;
+}
+
 /// Computes the full analytical snapshot of a trip from raw data.
 ///
 /// Pure Dart — no database or Flutter dependencies, so it can be unit-tested
@@ -10,14 +27,30 @@ double _round2(double value) => double.parse(value.toStringAsFixed(2));
 /// `summaryProvider`:
 ///   - A member's "paid" = sum of expenses where they are the payer.
 ///   - A member's "consumed" = sum of their `expense_participants` shares
-///     (only bills they joined — excluded members consume nothing).
+///     (only bills they joined — excluded members consume nothing), adjusted
+///     by the sponsorship discount factor `k = max(0, E-S)/E`.
+///
+/// [sponsorships] reduce the total split by [totalSponsorship]; every
+/// member's consumption is scaled by `k`, so `net = paid - k * consumed`.
+/// Internal sponsors' sponsorship funds do NOT count toward their paid
+/// advance — only what they actually paid out of pocket does.
 TripSummaryStats computeTripSummary({
   required List<Expense> expenses,
   required List<Participant> participants,
   required List<ExpenseParticipant> joined,
   required List<Settlement> settlements,
+  List<Sponsorship> sponsorships = const [],
 }) {
   final totalSpent = expenses.fold<double>(0, (sum, e) => sum + e.amount);
+  final totalSponsorship = sponsorships.fold<double>(
+    0,
+    (sum, s) => sum + s.amount,
+  );
+  final discountFactor = sponsorshipDiscountFactor(
+    totalSpent: totalSpent,
+    totalSponsorship: totalSponsorship,
+  );
+  final netTotal = _round2(totalSpent * discountFactor);
   final memberCount = participants.length;
   final averagePerMember = memberCount > 0 ? totalSpent / memberCount : 0.0;
 
@@ -54,7 +87,7 @@ TripSummaryStats computeTripSummary({
 
   final members = participants.map((p) {
     final paid = _round2(totalPaid[p.id] ?? 0);
-    final consumed = _round2(totalConsumed[p.id] ?? 0);
+    final consumed = _round2((totalConsumed[p.id] ?? 0) * discountFactor);
     final net = _round2(paid - consumed);
     final joined = joinedCount[p.id] ?? 0;
     return MemberStat(
@@ -101,5 +134,9 @@ TripSummaryStats computeTripSummary({
     members: members,
     settlements: settlements,
     paidSettlementsCount: paidSettlementsCount,
+    totalSponsorship: _round2(totalSponsorship),
+    netTotal: netTotal,
+    discountFactor: discountFactor,
+    sponsorships: sponsorships,
   );
 }

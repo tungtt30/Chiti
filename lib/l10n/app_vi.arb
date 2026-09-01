@@ -359,6 +359,90 @@
   "copyText": "Sao chép",
   "copiedToClipboard": "Đã sao chép vào clipboard",
 
+  "tabSponsorships": "Tài trợ",
+  "addSponsorship": "Thêm tài trợ",
+  "editSponsorship": "Sửa tài trợ",
+  "saveSponsorship": "Lưu tài trợ",
+  "deleteSponsorship": "Xóa tài trợ",
+  "sponsorshipSectionTitle": "Tài trợ",
+  "sponsorshipType": "Loại nhà tài trợ",
+  "sponsorshipTypeInternal": "Thành viên trong nhóm",
+  "sponsorshipTypeExternal": "Người ngoài / Mạnh thường quân",
+  "sponsorshipSponsor": "Nhà tài trợ",
+  "sponsorshipNote": "Ghi chú (không bắt buộc)",
+  "sponsorshipNameHint": "VD: Anh Nam tài trợ, Quỹ công ty tài trợ",
+  "sponsorshipMemberHint": "Chọn thành viên tài trợ cho nhóm",
+  "sponsorshipNameRequired": "Nhập tên nhà tài trợ",
+  "noSponsorshipsYet": "Chưa có tài trợ",
+  "noSponsorshipsHint": "Nhấn + để thêm tài trợ, giúp giảm chi phí mọi người phải đóng",
+  "deleteSponsorshipDialogTitle": "Xóa khoản tài trợ?",
+  "deleteSponsorshipDialogContent": "Xóa khoản tài trợ {amount} của {name}?",
+  "@deleteSponsorshipDialogContent": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "kpiTotalSponsorship": "Tài trợ",
+  "kpiNetToSplit": "Còn lại phải chia",
+  "sponsorshipTotalLine": "Tổng tài trợ: {amount}",
+  "@sponsorshipTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sponsorshipNetToSplitLine": "Còn lại phải chia: {amount}",
+  "@sponsorshipNetToSplitLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sponsorshipCovered": "Tài trợ đã chi {percent}% chi phí",
+  "@sponsorshipCovered": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "sponsorshipDiscountFactor": "Mỗi thành viên đóng {percent}% phần của mình",
+  "@sponsorshipDiscountFactor": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "sponsorshipFullyCovered": "Đã được tài trợ toàn bộ 🎉",
+  "reportSponsorshipsHeader": "Tài trợ:",
+  "reportSponsorshipLine": "• {name}: {amount}",
+  "@reportSponsorshipLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportNetTotalLine": "Còn lại phải chia: {amount}",
+  "@reportNetTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
   "reportTitle": "BÁO CÁO NHÓM \"{groupName}\"",
   "@reportTitle": {
     "placeholders": {

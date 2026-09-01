@@ -53,6 +53,9 @@ that makes settling up genuinely pleasant.
 
 - **Real-time summary dashboard** — per-member audit (Paid / Owes / Net), KPI
   cards, and category distribution charts.
+- **Sponsorships (Tài trợ)** — internal members or external sponsors
+  (Mạnh thường quân) can fund the group; every member's split is discounted
+  proportionally (`net = max(0, expenses − sponsored)`).
 - **1-tap copy & share** — export a plain-text report straight to group chats
   (Zalo, Telegram, Messenger).
 - **Long-image export** — capture the full summary or expense list as a PNG and
