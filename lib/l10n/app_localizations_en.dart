@@ -54,13 +54,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDark => 'Dark';
 
   @override
-  String get themeSakura => 'Sakura · Cherry Blossom';
+  String get themeSpring => 'Spring · Cherry Blossom';
 
   @override
-  String get petalsToggle => 'Falling petals';
+  String get themeAutumn => 'Autumn · Falling Leaves';
 
   @override
-  String get petalsHint => 'Turn off to save battery';
+  String get themeWinter => 'Winter · Snowflakes';
+
+  @override
+  String get particlesToggle => 'Falling particles';
+
+  @override
+  String get particlesHint => 'Turn off to save battery';
 
   @override
   String get systemDefault => 'System default';

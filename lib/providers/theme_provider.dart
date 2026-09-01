@@ -2,19 +2,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _themePrefsKey = 'app_theme_mode';
-const _petalsPrefsKey = 'app_petals_enabled';
+const _particlesPrefsKey = 'app_particles_enabled';
+const _legacyParticlesPrefsKey = 'app_petals_enabled';
 
 /// App theme choice. `null` follows the device system theme.
 enum AppThemeMode {
   system,
   light,
   dark,
-  sakura;
+  spring,
+  autumn,
+  winter;
+
+  /// Whether this mode is a seasonal (light, particle-background) theme.
+  bool get isSeasonal =>
+      this == AppThemeMode.spring ||
+      this == AppThemeMode.autumn ||
+      this == AppThemeMode.winter;
 
   static AppThemeMode fromValue(String? value) => switch (value) {
     'light' => AppThemeMode.light,
     'dark' => AppThemeMode.dark,
-    'sakura' => AppThemeMode.sakura,
+    // Legacy key: the former "Sakura" theme is now "Spring".
+    'sakura' => AppThemeMode.spring,
+    'spring' => AppThemeMode.spring,
+    'autumn' => AppThemeMode.autumn,
+    'winter' => AppThemeMode.winter,
     _ => AppThemeMode.system,
   };
 
@@ -22,21 +35,23 @@ enum AppThemeMode {
     AppThemeMode.system => 'system',
     AppThemeMode.light => 'light',
     AppThemeMode.dark => 'dark',
-    AppThemeMode.sakura => 'sakura',
+    AppThemeMode.spring => 'spring',
+    AppThemeMode.autumn => 'autumn',
+    AppThemeMode.winter => 'winter',
   };
 }
 
-/// Active app theme + falling-petal toggle, persisted in shared_preferences.
+/// Active app theme + falling-particle toggle, persisted in shared_preferences.
 final themeProvider =
     StateNotifierProvider<ThemeNotifier, AppThemeMode>(
       (ref) => ThemeNotifier(),
     );
 
-/// Whether the falling-petal background is enabled (only meaningful while the
-/// Sakura theme is active).
-final petalsEnabledProvider =
-    StateNotifierProvider<PetalsToggleNotifier, bool>(
-      (ref) => PetalsToggleNotifier(),
+/// Whether the seasonal particle background is enabled (only meaningful while
+/// a seasonal theme is active).
+final particlesEnabledProvider =
+    StateNotifierProvider<ParticlesToggleNotifier, bool>(
+      (ref) => ParticlesToggleNotifier(),
     );
 
 class ThemeNotifier extends StateNotifier<AppThemeMode> {
@@ -64,15 +79,19 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
   }
 }
 
-class PetalsToggleNotifier extends StateNotifier<bool> {
-  PetalsToggleNotifier() : super(false) {
+class ParticlesToggleNotifier extends StateNotifier<bool> {
+  ParticlesToggleNotifier() : super(false) {
     _load();
   }
 
   Future<void> _load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      state = prefs.getBool(_petalsPrefsKey) ?? false;
+      // Migrate the legacy petals toggle so existing users keep their choice.
+      state =
+          prefs.getBool(_particlesPrefsKey) ??
+          prefs.getBool(_legacyParticlesPrefsKey) ??
+          false;
     } catch (_) {
       // Keep the default.
     }
@@ -82,7 +101,7 @@ class PetalsToggleNotifier extends StateNotifier<bool> {
     state = enabled;
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_petalsPrefsKey, enabled);
+      await prefs.setBool(_particlesPrefsKey, enabled);
     } catch (_) {
       // Best-effort.
     }

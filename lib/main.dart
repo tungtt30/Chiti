@@ -6,13 +6,15 @@ import 'package:quick_actions/quick_actions.dart';
 
 import 'core/services/quick_actions_service.dart';
 import 'core/services/widget_service.dart';
-import 'core/theme/sakura_theme.dart';
+import 'core/theme/autumn_theme.dart';
+import 'core/theme/spring_theme.dart';
+import 'core/theme/winter_theme.dart';
+import 'core/widgets/seasonal_particles.dart';
 import 'l10n/app_localizations.dart';
 import 'presentation/screens/add_edit_expense_screen.dart';
 import 'presentation/screens/add_trip_screen.dart';
 import 'presentation/screens/trip_dashboard_screen.dart';
 import 'presentation/screens/trip_detail_screen.dart';
-import 'presentation/widgets/petals_animation.dart';
 import 'providers/locale_provider.dart';
 import 'providers/theme_provider.dart';
 
@@ -118,8 +120,9 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeProvider);
-    final petalsEnabled =
-        ref.watch(petalsEnabledProvider) && themeMode == AppThemeMode.sakura;
+    final isSeasonal = themeMode.isSeasonal;
+    final particlesEnabled =
+        ref.watch(particlesEnabledProvider) && isSeasonal;
 
     final lightTheme = ThemeData(
       colorSchemeSeed: Colors.teal,
@@ -131,14 +134,19 @@ class _MyAppState extends ConsumerState<MyApp> {
       useMaterial3: true,
       brightness: Brightness.dark,
     );
-    final isSakura = themeMode == AppThemeMode.sakura;
+    final seasonalTheme = switch (themeMode) {
+      AppThemeMode.spring => SpringTheme.themeData,
+      AppThemeMode.autumn => AutumnTheme.themeData,
+      AppThemeMode.winter => WinterTheme.themeData,
+      _ => null,
+    };
 
     return MaterialApp(
       navigatorKey: _navigatorKey,
       onGenerateTitle: (context) =>
           AppLocalizations.of(context)?.appTitle ?? 'Chiti',
       debugShowCheckedModeBanner: false,
-      theme: isSakura ? SakuraTheme.themeData : lightTheme,
+      theme: seasonalTheme ?? lightTheme,
       darkTheme: darkTheme,
       themeMode: themeMode == AppThemeMode.system
           ? ThemeMode.system
@@ -152,16 +160,26 @@ class _MyAppState extends ConsumerState<MyApp> {
       builder: (context, child) => Stack(
         fit: StackFit.expand,
         children: [
-          // Background layer: soft pink + falling petals sit BEHIND the
-          // Navigator's content (Scaffolds are transparent in the Sakura
-          // theme so this layer shows through everywhere).
-          if (isSakura)
+          // Background layer: the seasonal backdrop + falling particles sit
+          // BEHIND the Navigator's content (Scaffolds are transparent in
+          // seasonal themes so this layer shows through everywhere).
+          if (isSeasonal)
             Positioned.fill(
-              child: PetalField(enabled: petalsEnabled),
+              child: SeasonalBackgroundWrapper(
+                type: _particleTypeFor(themeMode),
+                enabled: particlesEnabled,
+              ),
             ),
           ?child,
         ],
       ),
     );
   }
+
+  ParticleType _particleTypeFor(AppThemeMode mode) => switch (mode) {
+    AppThemeMode.spring => ParticleType.springPetal,
+    AppThemeMode.autumn => ParticleType.autumnLeaf,
+    AppThemeMode.winter => ParticleType.winterSnow,
+    _ => ParticleType.springPetal,
+  };
 }

@@ -54,13 +54,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get themeDark => 'Tối';
 
   @override
-  String get themeSakura => 'Sakura · Hoa anh đào';
+  String get themeSpring => 'Mùa xuân · Hoa anh đào';
 
   @override
-  String get petalsToggle => 'Cánh hoa rơi';
+  String get themeAutumn => 'Mùa thu · Lá rơi';
 
   @override
-  String get petalsHint => 'Tắt để tiết kiệm pin';
+  String get themeWinter => 'Mùa đông · Tuyết rơi';
+
+  @override
+  String get particlesToggle => 'Hạt rơi theo mùa';
+
+  @override
+  String get particlesHint => 'Tắt để tiết kiệm pin';
 
   @override
   String get systemDefault => 'Theo hệ thống';

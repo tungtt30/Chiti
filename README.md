@@ -58,11 +58,15 @@ that makes settling up genuinely pleasant.
 - **Long-image export** — capture the full summary or expense list as a PNG and
   share or save it to the gallery.
 
-### 🌸 Polished Material 3 & Sakura Theme
+### 🌸 Polished Material 3 & Seasonal Themes
 
 - **Material 3** design with Light, Dark, and System theme modes.
-- **Custom Pastel Sakura theme** — a soft cherry-blossom pink palette with
-  falling **petal particle effects** across the app.
+- **Three seasonal themes** with matching particle backgrounds:
+  - **Spring (🌸)** — pastel cherry-blossom pink with falling petals.
+  - **Autumn (🍂)** — warm amber & maple with tumbling falling leaves.
+  - **Winter (❄️)** — crisp frost blue with soft falling snowflakes.
+- One lightweight polymorphic particle engine (≤2% CPU, 60fps, pointer-transparent)
+  drives all three seasons.
 - Smooth, responsive animations and rounded, card-based layouts.
 
 ### 🔒 Local & Serverless Security
@@ -144,7 +148,8 @@ lib/
 │   ├── settlement_calculator.dart  # Greedy settlement algorithm + split helpers
 │   ├── summary_calculator.dart  # Net balances & summary aggregation
 │   ├── trip_report_text.dart    # Plain-text report for group-chat sharing
-│   └── theme/sakura_theme.dart  # Pastel Sakura design system
+│   └── theme/                    # Seasonal design systems (spring, autumn,
+│                                #    winter) + base Material 3 themes
 ├── data/
 │   ├── database_helper.dart     # SQLite schema, FKs, migrations (sqflite)
 │   ├── repository.dart          # Data access / transactions
@@ -155,7 +160,7 @@ lib/
     ├── screens/                 # Dashboard, TripDetail, AddExpense, AddTrip,
     │                            # ManageParticipants, Settings
     └── widgets/                 # SummaryTable, SettlementCard, chips,
-                                 # PetalField, KPI cards, category breakdown
+                                 # KPI cards, category breakdown
 ```
 
 ### Settlement engine (greedy algorithm)

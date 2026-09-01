@@ -6,7 +6,8 @@ import '../../providers/locale_provider.dart';
 import '../../providers/theme_provider.dart';
 
 /// App settings: in-app language switching (English / Tiếng Việt), theme
-/// selection (System / Light / Dark / Sakura) and the falling-petal toggle.
+/// selection (System / Light / Dark / Spring / Autumn / Winter) and the
+/// seasonal particle toggle.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -16,7 +17,7 @@ class SettingsScreen extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
     final selected = locale?.languageCode ?? 'system';
     final themeMode = ref.watch(themeProvider);
-    final petalsEnabled = ref.watch(petalsEnabledProvider);
+    final particlesEnabled = ref.watch(particlesEnabledProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle), centerTitle: true),
@@ -100,23 +101,33 @@ class SettingsScreen extends ConsumerWidget {
                     secondary: const Icon(Icons.dark_mode_outlined),
                   ),
                   RadioListTile<AppThemeMode>(
-                    value: AppThemeMode.sakura,
-                    title: Text(l10n.themeSakura),
+                    value: AppThemeMode.spring,
+                    title: Text(l10n.themeSpring),
                     secondary: const Text('🌸'),
+                  ),
+                  RadioListTile<AppThemeMode>(
+                    value: AppThemeMode.autumn,
+                    title: Text(l10n.themeAutumn),
+                    secondary: const Text('🍂'),
+                  ),
+                  RadioListTile<AppThemeMode>(
+                    value: AppThemeMode.winter,
+                    title: Text(l10n.themeWinter),
+                    secondary: const Text('❄️'),
                   ),
                 ],
               ),
             ),
           ),
-          if (themeMode == AppThemeMode.sakura) ...[
+          if (themeMode.isSeasonal) ...[
             const SizedBox(height: 8),
             Card(
               child: SwitchListTile(
-                value: petalsEnabled,
+                value: particlesEnabled,
                 onChanged: (v) =>
-                    ref.read(petalsEnabledProvider.notifier).setEnabled(v),
-                title: Text(l10n.petalsToggle),
-                subtitle: Text(l10n.petalsHint),
+                    ref.read(particlesEnabledProvider.notifier).setEnabled(v),
+                title: Text(l10n.particlesToggle),
+                subtitle: Text(l10n.particlesHint),
                 secondary: const Icon(Icons.air),
               ),
             ),

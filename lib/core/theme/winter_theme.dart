@@ -1,36 +1,39 @@
 import 'package:flutter/material.dart';
 
-/// Pastel Sakura (Hồng phấn hoa anh đào) design system.
+/// Winter (Mùa đông) design system.
 ///
-/// Soft cherry-blossom palette with warm brown text for high contrast while
-/// staying gentle on the eyes. Material 3 compliant.
-abstract final class SakuraTheme {
+/// Crisp frost-blue palette with glacier ice containers, slate accents and
+/// midnight-navy text. Material 3 compliant.
+abstract final class WinterTheme {
   // Color Palette
-  static const Color primaryPink = Color(0xFFF06292); // Hoa đào nở
-  static const Color primaryContainer = Color(0xFFFFD8E4); // Hồng phấn nhạt
-  static const Color softBackground = Color(0xFFFFF5F7); // Nền hồng sữa cực dịu
-  static const Color surfaceCard = Color(0xFFFFFFFF); // Thẻ trắng điểm viền hồng
-  static const Color petalPink = Color(0xFFFFB7C5); // Màu cánh hoa rơi
-  static const Color textDark = Color(0xFF3E2723); // Chữ nâu đậm
-  static const Color accentRose = Color(0xFFD81B60); // Điểm nhấn nút bấm / badge
+  static const Color primaryFrost = Color(0xFF0284C7); // Frost blue
+  static const Color primaryContainer = Color(0xFFE0F2FE); // Glacier ice light
+  static const Color softBackground = Color(0xFFF8FAFC); // Snow white / cool gray
+  static const Color surfaceCard = Color(0xFFFFFFFF); // Thẻ trắng điểm viền băng
+  static const Color cardBorder = Color(0xFFBAE6FD); // Viền thẻ băng xanh
+  static const Color textDark = Color(0xFF0F172A); // Midnight slate
+  // Falling-snow palette (soft whites with a hint of glacier ice).
+  static const List<Color> snowPalette = [
+    Color(0xFFFFFFFF),
+    Color(0xFFF0F9FF),
+    Color(0xFFE0F2FE),
+  ];
 
-  static const Color _cardBorder = Color(0xFFFFE0E8);
-  static const Color _cardShadow = Color(0x1AF06292);
+  static const Color _cardShadow = Color(0x1A0284C7);
 
   static ThemeData get themeData {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryPink,
-        primary: accentRose,
+        seedColor: primaryFrost,
+        primary: primaryFrost,
         primaryContainer: primaryContainer,
         surface: softBackground,
         onSurface: textDark,
         brightness: Brightness.light,
       ),
-      // Transparent so the app-wide falling-petal layer (which paints the
-      // soft pink backdrop itself) shows through as the background behind
-      // every screen. Cards / AppBars keep their own solid colors.
+      // Transparent so the app-wide seasonal particle layer (which paints the
+      // snowy backdrop itself) shows through behind every screen.
       scaffoldBackgroundColor: Colors.transparent,
       cardTheme: const CardThemeData(
         color: surfaceCard,
@@ -38,7 +41,7 @@ abstract final class SakuraTheme {
         shadowColor: _cardShadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
-          side: BorderSide(color: _cardBorder, width: 0.8),
+          side: BorderSide(color: cardBorder, width: 0.8),
         ),
       ),
       appBarTheme: const AppBarTheme(
@@ -48,7 +51,7 @@ abstract final class SakuraTheme {
         centerTitle: true,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: accentRose,
+        backgroundColor: primaryFrost,
         foregroundColor: Colors.white,
       ),
       dialogTheme: const DialogThemeData(
