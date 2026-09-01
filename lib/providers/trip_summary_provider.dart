@@ -25,11 +25,15 @@ final tripSummaryProvider = FutureProvider.autoDispose.family<
   final settlements =
       ref.watch(settlementsProvider(tripId)).valueOrNull ??
       const <Settlement>[];
+  final sponsorships =
+      ref.watch(sponsorshipsProvider(tripId)).valueOrNull ??
+      const <Sponsorship>[];
 
   return computeTripSummary(
     expenses: expenses,
     participants: participants,
     joined: joined,
     settlements: settlements,
+    sponsorships: sponsorships,
   );
 });

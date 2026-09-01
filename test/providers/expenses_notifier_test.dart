@@ -97,6 +97,9 @@ class FakeAppRepository extends AppRepository {
       ..removeWhere((s) => s.tripId == tripId)
       ..addAll(newSettlements);
   }
+
+  @override
+  Future<List<Sponsorship>> getSponsorships(String tripId) async => [];
 }
 
 void main() {

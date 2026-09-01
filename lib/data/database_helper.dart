@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const int _dbVersion = 6;
+  static const int _dbVersion = 7;
   static Database? _database;
 
   Future<Database> get database async {
@@ -35,8 +35,9 @@ class DatabaseHelper {
   /// v4 -> v5 adds `host_id` + `settlement_mode` to trips (host/treasurer
   /// settlement mode). v5 -> v6 remaps the legacy trip-era category ids
   /// ('Food', 'Lodging', 'Activities', ...) onto the multi-purpose preset set.
+  /// v6 -> v7 adds the `sponsorships` table (Tài trợ).
   /// All steps are additive and applied for any older version, so upgrading
-  /// from v3 straight to v6 also works.
+  /// from v3 straight to v7 also works.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 3) {
       await _dropSchema(db);
@@ -77,6 +78,9 @@ class DatabaseHelper {
           END
         ''');
       }
+      if (oldVersion <= 6) {
+        await _createSponsorshipsTable(db);
+      }
     }
   }
 
@@ -85,6 +89,7 @@ class DatabaseHelper {
     // child tables (expense_payers/expense_splits) break FK resolution when a
     // parent (expenses/participants) is dropped with PRAGMA foreign_keys = ON.
     await db.execute('DROP TABLE IF EXISTS settlements');
+    await db.execute('DROP TABLE IF EXISTS sponsorships');
     await db.execute('DROP TABLE IF EXISTS expense_payers');
     await db.execute('DROP TABLE IF EXISTS expense_splits');
     await db.execute('DROP TABLE IF EXISTS expense_participants');
@@ -176,6 +181,30 @@ class DatabaseHelper {
     );
     await db.execute(
       'CREATE INDEX idx_settlements_trip ON settlements(trip_id)',
+    );
+
+    await _createSponsorshipsTable(db);
+  }
+
+  /// Sponsorship (Tài trợ) entries: a fixed amount sponsored towards the
+  /// group, either by an internal member (`member_id` set) or an external
+  /// sponsor/guest (`member_id` NULL, free-text name).
+  Future<void> _createSponsorshipsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sponsorships (
+        id TEXT PRIMARY KEY,
+        trip_id TEXT NOT NULL,
+        sponsor_name TEXT NOT NULL,
+        member_id TEXT,
+        amount REAL NOT NULL,
+        note TEXT,
+        created_at INTEGER NOT NULL,
+        FOREIGN KEY (trip_id) REFERENCES trips(id) ON DELETE CASCADE,
+        FOREIGN KEY (member_id) REFERENCES participants(id) ON DELETE SET NULL
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_sponsorships_trip ON sponsorships(trip_id)',
     );
   }
 

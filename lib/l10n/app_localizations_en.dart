@@ -45,6 +45,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSectionTitle => 'Language';
 
   @override
+  String get themeSectionTitle => 'Theme';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeSpring => 'Spring · Cherry Blossom';
+
+  @override
+  String get themeAutumn => 'Autumn · Falling Leaves';
+
+  @override
+  String get themeWinter => 'Winter · Snowflakes';
+
+  @override
+  String get particlesToggle => 'Falling particles';
+
+  @override
+  String get particlesHint => 'Turn off to save battery';
+
+  @override
   String get systemDefault => 'System default';
 
   @override
@@ -496,6 +520,105 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String get tabSponsorships => 'Sponsorships';
+
+  @override
+  String get addSponsorship => 'Add Sponsorship';
+
+  @override
+  String get editSponsorship => 'Edit Sponsorship';
+
+  @override
+  String get saveSponsorship => 'Save Sponsorship';
+
+  @override
+  String get deleteSponsorship => 'Delete sponsorship';
+
+  @override
+  String get sponsorshipSectionTitle => 'Sponsorships';
+
+  @override
+  String get sponsorshipType => 'Sponsor type';
+
+  @override
+  String get sponsorshipTypeInternal => 'Internal Member';
+
+  @override
+  String get sponsorshipTypeExternal => 'External Sponsor';
+
+  @override
+  String get sponsorshipSponsor => 'Sponsor';
+
+  @override
+  String get sponsorshipNote => 'Note (optional)';
+
+  @override
+  String get sponsorshipNameHint => 'e.g. Anh Nam tài trợ, Quỹ công ty tài trợ';
+
+  @override
+  String get sponsorshipMemberHint => 'Pick the member who sponsors this group';
+
+  @override
+  String get sponsorshipNameRequired => 'Enter the sponsor name';
+
+  @override
+  String get noSponsorshipsYet => 'No sponsorships yet';
+
+  @override
+  String get noSponsorshipsHint =>
+      'Tap + to add sponsorship and reduce what everyone pays';
+
+  @override
+  String get deleteSponsorshipDialogTitle => 'Delete sponsorship?';
+
+  @override
+  String deleteSponsorshipDialogContent(String amount, String name) {
+    return 'Remove the $amount sponsorship by $name?';
+  }
+
+  @override
+  String get kpiTotalSponsorship => 'Sponsored';
+
+  @override
+  String get kpiNetToSplit => 'Net to split';
+
+  @override
+  String sponsorshipTotalLine(String amount) {
+    return 'Total sponsored: $amount';
+  }
+
+  @override
+  String sponsorshipNetToSplitLine(String amount) {
+    return 'Net to split: $amount';
+  }
+
+  @override
+  String sponsorshipCovered(int percent) {
+    return 'Sponsorships cover $percent% of expenses';
+  }
+
+  @override
+  String sponsorshipDiscountFactor(int percent) {
+    return 'Each member pays $percent% of their share';
+  }
+
+  @override
+  String get sponsorshipFullyCovered => 'Fully covered by sponsorships 🎉';
+
+  @override
+  String get reportSponsorshipsHeader => 'Sponsorships:';
+
+  @override
+  String reportSponsorshipLine(String name, String amount) {
+    return '• $name: $amount';
+  }
+
+  @override
+  String reportNetTotalLine(String amount) {
+    return 'Net to split: $amount';
+  }
 
   @override
   String reportTitle(String groupName) {

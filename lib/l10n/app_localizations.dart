@@ -164,6 +164,54 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get languageSectionTitle;
 
+  /// No description provided for @themeSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeSectionTitle;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeSpring.
+  ///
+  /// In en, this message translates to:
+  /// **'Spring · Cherry Blossom'**
+  String get themeSpring;
+
+  /// No description provided for @themeAutumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Autumn · Falling Leaves'**
+  String get themeAutumn;
+
+  /// No description provided for @themeWinter.
+  ///
+  /// In en, this message translates to:
+  /// **'Winter · Snowflakes'**
+  String get themeWinter;
+
+  /// No description provided for @particlesToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Falling particles'**
+  String get particlesToggle;
+
+  /// No description provided for @particlesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off to save battery'**
+  String get particlesHint;
+
   /// No description provided for @systemDefault.
   ///
   /// In en, this message translates to:
@@ -967,6 +1015,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copied to clipboard'**
   String get copiedToClipboard;
+
+  /// No description provided for @tabSponsorships.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsorships'**
+  String get tabSponsorships;
+
+  /// No description provided for @addSponsorship.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Sponsorship'**
+  String get addSponsorship;
+
+  /// No description provided for @editSponsorship.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Sponsorship'**
+  String get editSponsorship;
+
+  /// No description provided for @saveSponsorship.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Sponsorship'**
+  String get saveSponsorship;
+
+  /// No description provided for @deleteSponsorship.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete sponsorship'**
+  String get deleteSponsorship;
+
+  /// No description provided for @sponsorshipSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsorships'**
+  String get sponsorshipSectionTitle;
+
+  /// No description provided for @sponsorshipType.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsor type'**
+  String get sponsorshipType;
+
+  /// No description provided for @sponsorshipTypeInternal.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal Member'**
+  String get sponsorshipTypeInternal;
+
+  /// No description provided for @sponsorshipTypeExternal.
+  ///
+  /// In en, this message translates to:
+  /// **'External Sponsor'**
+  String get sponsorshipTypeExternal;
+
+  /// No description provided for @sponsorshipSponsor.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsor'**
+  String get sponsorshipSponsor;
+
+  /// No description provided for @sponsorshipNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get sponsorshipNote;
+
+  /// No description provided for @sponsorshipNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Anh Nam tài trợ, Quỹ công ty tài trợ'**
+  String get sponsorshipNameHint;
+
+  /// No description provided for @sponsorshipMemberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the member who sponsors this group'**
+  String get sponsorshipMemberHint;
+
+  /// No description provided for @sponsorshipNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the sponsor name'**
+  String get sponsorshipNameRequired;
+
+  /// No description provided for @noSponsorshipsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No sponsorships yet'**
+  String get noSponsorshipsYet;
+
+  /// No description provided for @noSponsorshipsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to add sponsorship and reduce what everyone pays'**
+  String get noSponsorshipsHint;
+
+  /// No description provided for @deleteSponsorshipDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete sponsorship?'**
+  String get deleteSponsorshipDialogTitle;
+
+  /// No description provided for @deleteSponsorshipDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the {amount} sponsorship by {name}?'**
+  String deleteSponsorshipDialogContent(String amount, String name);
+
+  /// No description provided for @kpiTotalSponsorship.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored'**
+  String get kpiTotalSponsorship;
+
+  /// No description provided for @kpiNetToSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Net to split'**
+  String get kpiNetToSplit;
+
+  /// No description provided for @sponsorshipTotalLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Total sponsored: {amount}'**
+  String sponsorshipTotalLine(String amount);
+
+  /// No description provided for @sponsorshipNetToSplitLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Net to split: {amount}'**
+  String sponsorshipNetToSplitLine(String amount);
+
+  /// No description provided for @sponsorshipCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsorships cover {percent}% of expenses'**
+  String sponsorshipCovered(int percent);
+
+  /// No description provided for @sponsorshipDiscountFactor.
+  ///
+  /// In en, this message translates to:
+  /// **'Each member pays {percent}% of their share'**
+  String sponsorshipDiscountFactor(int percent);
+
+  /// No description provided for @sponsorshipFullyCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully covered by sponsorships 🎉'**
+  String get sponsorshipFullyCovered;
+
+  /// No description provided for @reportSponsorshipsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsorships:'**
+  String get reportSponsorshipsHeader;
+
+  /// No description provided for @reportSponsorshipLine.
+  ///
+  /// In en, this message translates to:
+  /// **'• {name}: {amount}'**
+  String reportSponsorshipLine(String name, String amount);
+
+  /// No description provided for @reportNetTotalLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Net to split: {amount}'**
+  String reportNetTotalLine(String amount);
 
   /// No description provided for @reportTitle.
   ///

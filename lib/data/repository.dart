@@ -278,4 +278,53 @@ class AppRepository {
       whereArgs: [id],
     );
   }
+
+  // ---- Sponsorships ----
+
+  Future<List<Sponsorship>> getSponsorships(String tripId) async {
+    final db = await _helper.database;
+    final maps = await db.query(
+      'sponsorships',
+      where: 'trip_id = ?',
+      whereArgs: [tripId],
+      orderBy: 'created_at ASC',
+    );
+    return maps.map((m) => Sponsorship.fromMap(m)).toList();
+  }
+
+  Future<Sponsorship> createSponsorship({
+    required String tripId,
+    required String sponsorName,
+    String? memberId,
+    required double amount,
+    String? note,
+  }) async {
+    final db = await _helper.database;
+    final sponsorship = Sponsorship(
+      id: generateId(),
+      tripId: tripId,
+      sponsorName: sponsorName,
+      memberId: memberId,
+      amount: amount,
+      note: note,
+      createdAt: DateTime.now(),
+    );
+    await db.insert('sponsorships', sponsorship.toMap());
+    return sponsorship;
+  }
+
+  Future<void> updateSponsorship(Sponsorship sponsorship) async {
+    final db = await _helper.database;
+    await db.update(
+      'sponsorships',
+      sponsorship.toMap(),
+      where: 'id = ?',
+      whereArgs: [sponsorship.id],
+    );
+  }
+
+  Future<void> deleteSponsorship(String id) async {
+    final db = await _helper.database;
+    await db.delete('sponsorships', where: 'id = ?', whereArgs: [id]);
+  }
 }

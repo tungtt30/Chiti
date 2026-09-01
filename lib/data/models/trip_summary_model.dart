@@ -1,4 +1,5 @@
 import 'settlement.dart';
+import 'sponsorship.dart';
 
 /// Largest single expense, for the KPI card.
 class TopExpense {
@@ -57,6 +58,11 @@ class CategoryStat {
 
 /// Full analytical snapshot of a trip: aggregate KPIs, member audit, category
 /// distribution and the debt-settlement plan.
+///
+/// Sponsorship fields: [totalSponsorship] is the sum of all sponsorship
+/// amounts, [netTotal] is `max(0, E_total - S_total)` (the amount that is
+/// actually split among members) and [discountFactor] is the ratio
+/// `netTotal / E_total` applied to every member's consumption.
 class TripSummaryStats {
   final double totalSpent;
   final double averagePerMember;
@@ -66,6 +72,10 @@ class TripSummaryStats {
   final List<MemberStat> members;
   final List<Settlement> settlements;
   final int paidSettlementsCount;
+  final double totalSponsorship;
+  final double netTotal;
+  final double discountFactor;
+  final List<Sponsorship> sponsorships;
 
   const TripSummaryStats({
     required this.totalSpent,
@@ -76,6 +86,10 @@ class TripSummaryStats {
     required this.members,
     required this.settlements,
     required this.paidSettlementsCount,
+    this.totalSponsorship = 0,
+    this.netTotal = 0,
+    this.discountFactor = 1,
+    this.sponsorships = const [],
   });
 
   TripSummaryStats copyWith({
@@ -87,6 +101,10 @@ class TripSummaryStats {
     List<MemberStat>? members,
     List<Settlement>? settlements,
     int? paidSettlementsCount,
+    double? totalSponsorship,
+    double? netTotal,
+    double? discountFactor,
+    List<Sponsorship>? sponsorships,
   }) {
     return TripSummaryStats(
       totalSpent: totalSpent ?? this.totalSpent,
@@ -97,6 +115,10 @@ class TripSummaryStats {
       members: members ?? this.members,
       settlements: settlements ?? this.settlements,
       paidSettlementsCount: paidSettlementsCount ?? this.paidSettlementsCount,
+      totalSponsorship: totalSponsorship ?? this.totalSponsorship,
+      netTotal: netTotal ?? this.netTotal,
+      discountFactor: discountFactor ?? this.discountFactor,
+      sponsorships: sponsorships ?? this.sponsorships,
     );
   }
 }

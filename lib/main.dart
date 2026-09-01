@@ -6,12 +6,17 @@ import 'package:quick_actions/quick_actions.dart';
 
 import 'core/services/quick_actions_service.dart';
 import 'core/services/widget_service.dart';
+import 'core/theme/autumn_theme.dart';
+import 'core/theme/spring_theme.dart';
+import 'core/theme/winter_theme.dart';
+import 'core/widgets/seasonal_particles.dart';
 import 'l10n/app_localizations.dart';
 import 'presentation/screens/add_edit_expense_screen.dart';
 import 'presentation/screens/add_trip_screen.dart';
 import 'presentation/screens/trip_dashboard_screen.dart';
 import 'presentation/screens/trip_detail_screen.dart';
 import 'providers/locale_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -114,27 +119,67 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(localeProvider);
+    final themeMode = ref.watch(themeProvider);
+    final isSeasonal = themeMode.isSeasonal;
+    final particlesEnabled =
+        ref.watch(particlesEnabledProvider) && isSeasonal;
+
+    final lightTheme = ThemeData(
+      colorSchemeSeed: Colors.teal,
+      useMaterial3: true,
+      brightness: Brightness.light,
+    );
+    final darkTheme = ThemeData(
+      colorSchemeSeed: Colors.teal,
+      useMaterial3: true,
+      brightness: Brightness.dark,
+    );
+    final seasonalTheme = switch (themeMode) {
+      AppThemeMode.spring => SpringTheme.themeData,
+      AppThemeMode.autumn => AutumnTheme.themeData,
+      AppThemeMode.winter => WinterTheme.themeData,
+      _ => null,
+    };
 
     return MaterialApp(
       navigatorKey: _navigatorKey,
       onGenerateTitle: (context) =>
           AppLocalizations.of(context)?.appTitle ?? 'Chiti',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.teal,
-        useMaterial3: true,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        colorSchemeSeed: Colors.teal,
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
-      themeMode: ThemeMode.system,
+      theme: seasonalTheme ?? lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode == AppThemeMode.system
+          ? ThemeMode.system
+          : themeMode == AppThemeMode.dark
+          ? ThemeMode.dark
+          : ThemeMode.light,
       locale: locale,
       supportedLocales: const [Locale('vi'), Locale('en')],
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       home: const TripDashboardScreen(),
+      builder: (context, child) => Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background layer: the seasonal backdrop + falling particles sit
+          // BEHIND the Navigator's content (Scaffolds are transparent in
+          // seasonal themes so this layer shows through everywhere).
+          if (isSeasonal)
+            Positioned.fill(
+              child: SeasonalBackgroundWrapper(
+                type: _particleTypeFor(themeMode),
+                enabled: particlesEnabled,
+              ),
+            ),
+          ?child,
+        ],
+      ),
     );
   }
+
+  ParticleType _particleTypeFor(AppThemeMode mode) => switch (mode) {
+    AppThemeMode.spring => ParticleType.springPetal,
+    AppThemeMode.autumn => ParticleType.autumnLeaf,
+    AppThemeMode.winter => ParticleType.winterSnow,
+    _ => ParticleType.springPetal,
+  };
 }

@@ -45,6 +45,30 @@ class AppLocalizationsVi extends AppLocalizations {
   String get languageSectionTitle => 'Ngôn ngữ';
 
   @override
+  String get themeSectionTitle => 'Giao diện';
+
+  @override
+  String get themeLight => 'Sáng';
+
+  @override
+  String get themeDark => 'Tối';
+
+  @override
+  String get themeSpring => 'Mùa xuân · Hoa anh đào';
+
+  @override
+  String get themeAutumn => 'Mùa thu · Lá rơi';
+
+  @override
+  String get themeWinter => 'Mùa đông · Tuyết rơi';
+
+  @override
+  String get particlesToggle => 'Hạt rơi theo mùa';
+
+  @override
+  String get particlesHint => 'Tắt để tiết kiệm pin';
+
+  @override
   String get systemDefault => 'Theo hệ thống';
 
   @override
@@ -495,6 +519,105 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get copiedToClipboard => 'Đã sao chép vào clipboard';
+
+  @override
+  String get tabSponsorships => 'Tài trợ';
+
+  @override
+  String get addSponsorship => 'Thêm tài trợ';
+
+  @override
+  String get editSponsorship => 'Sửa tài trợ';
+
+  @override
+  String get saveSponsorship => 'Lưu tài trợ';
+
+  @override
+  String get deleteSponsorship => 'Xóa tài trợ';
+
+  @override
+  String get sponsorshipSectionTitle => 'Tài trợ';
+
+  @override
+  String get sponsorshipType => 'Loại nhà tài trợ';
+
+  @override
+  String get sponsorshipTypeInternal => 'Thành viên trong nhóm';
+
+  @override
+  String get sponsorshipTypeExternal => 'Người ngoài / Mạnh thường quân';
+
+  @override
+  String get sponsorshipSponsor => 'Nhà tài trợ';
+
+  @override
+  String get sponsorshipNote => 'Ghi chú (không bắt buộc)';
+
+  @override
+  String get sponsorshipNameHint => 'VD: Anh Nam tài trợ, Quỹ công ty tài trợ';
+
+  @override
+  String get sponsorshipMemberHint => 'Chọn thành viên tài trợ cho nhóm';
+
+  @override
+  String get sponsorshipNameRequired => 'Nhập tên nhà tài trợ';
+
+  @override
+  String get noSponsorshipsYet => 'Chưa có tài trợ';
+
+  @override
+  String get noSponsorshipsHint =>
+      'Nhấn + để thêm tài trợ, giúp giảm chi phí mọi người phải đóng';
+
+  @override
+  String get deleteSponsorshipDialogTitle => 'Xóa khoản tài trợ?';
+
+  @override
+  String deleteSponsorshipDialogContent(String amount, String name) {
+    return 'Xóa khoản tài trợ $amount của $name?';
+  }
+
+  @override
+  String get kpiTotalSponsorship => 'Tài trợ';
+
+  @override
+  String get kpiNetToSplit => 'Còn lại phải chia';
+
+  @override
+  String sponsorshipTotalLine(String amount) {
+    return 'Tổng tài trợ: $amount';
+  }
+
+  @override
+  String sponsorshipNetToSplitLine(String amount) {
+    return 'Còn lại phải chia: $amount';
+  }
+
+  @override
+  String sponsorshipCovered(int percent) {
+    return 'Tài trợ đã chi $percent% chi phí';
+  }
+
+  @override
+  String sponsorshipDiscountFactor(int percent) {
+    return 'Mỗi thành viên đóng $percent% phần của mình';
+  }
+
+  @override
+  String get sponsorshipFullyCovered => 'Đã được tài trợ toàn bộ 🎉';
+
+  @override
+  String get reportSponsorshipsHeader => 'Tài trợ:';
+
+  @override
+  String reportSponsorshipLine(String name, String amount) {
+    return '• $name: $amount';
+  }
+
+  @override
+  String reportNetTotalLine(String amount) {
+    return 'Còn lại phải chia: $amount';
+  }
 
   @override
   String reportTitle(String groupName) {

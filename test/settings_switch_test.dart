@@ -43,10 +43,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('My Groups'), findsOneWidget);
 
-    // System default clears the saved language.
+    // System default clears the saved language. Scope to the language card
+    // (the theme section also has a "System default" tile now).
     await tester.tap(find.byIcon(Icons.settings_outlined));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('System default'));
+    await tester.tap(
+      find
+          .widgetWithText(RadioListTile<String>, 'System default')
+          .first,
+    );
     await tester.pumpAndSettle();
     expect(prefs.containsKey('app_locale'), isFalse);
   });

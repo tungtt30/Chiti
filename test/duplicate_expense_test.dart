@@ -85,6 +85,9 @@ class FakeAppRepository extends AppRepository {
   Future<List<Settlement>> getSettlements(String tripId) async => [];
 
   @override
+  Future<List<Sponsorship>> getSponsorships(String tripId) async => [];
+
+  @override
   Future<Trip?> getTrip(String id) async => Trip(
     id: id,
     name: 'Nhóm cầu lông',

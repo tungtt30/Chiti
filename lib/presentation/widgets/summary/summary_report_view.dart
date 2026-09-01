@@ -44,7 +44,74 @@ class SummaryReportView extends StatelessWidget {
         _ReportHeader(trip: trip, hostName: hostName),
         const SizedBox(height: 12),
         KpiCards(stats: stats, currency: trip.currency, nameMap: nameMap),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
+        if (stats.totalSponsorship > 0) ...[
+          Text(
+            l10n.reportSponsorshipsHeader.toUpperCase(),
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card.filled(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final s in stats.sponsorships)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              s.sponsorName,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                          Text(
+                            formatCurrency(s.amount, trip.currency),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const Divider(height: 12),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.account_balance_wallet_outlined,
+                        size: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          l10n.kpiNetToSplit,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ),
+                      Text(
+                        formatCurrency(stats.netTotal, trip.currency),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
         Text(
           l10n.memberAuditTitle.toUpperCase(),
           style: theme.textTheme.labelLarge?.copyWith(

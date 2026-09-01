@@ -27,10 +27,9 @@ abstract final class QuickActionType {
 abstract final class QuickActionsService {
   static final QuickActions _quickActions = QuickActions();
 
-  /// Registers the three dynamic shortcuts (Android launcher long-press /
-  /// iOS home-screen 3D/Haptic Touch menu).
+  /// Registers the three dynamic shortcuts (Android launcher long-press menu).
   static Future<void> register(WidgetRef ref) async {
-    if (!Platform.isAndroid && !Platform.isIOS) return;
+    if (!Platform.isAndroid) return;
     try {
       final l10n = await _l10nForApp();
       await _quickActions.setShortcutItems([
